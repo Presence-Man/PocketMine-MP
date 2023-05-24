@@ -2,7 +2,7 @@
     "name": "presence-man/pmmp",
     "autoload": {
         "psr-4": {
-            "PresenceMan\\Pmmp\\": "src/"
+            "xxAROX\\PresenceMan\\": "src/xxAROX/PresenceMan/"
         }
     },
     "authors": [
