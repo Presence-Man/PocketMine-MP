@@ -1,0 +1,15 @@
+{
+    "name": "presence-man/pmmp",
+    "autoload": {
+        "psr-4": {
+            "PresenceMan\\Pmmp\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "xxAROX",
+            "email": "arox.email.0@gmail.com"
+        }
+    ],
+    "require": {}
+}
