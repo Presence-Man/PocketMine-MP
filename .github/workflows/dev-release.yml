@@ -1,0 +1,48 @@
+name: "Development release"
+on:
+  push:
+    branches: [ "development" ]
+
+jobs:
+  release:
+    name: "Create development release"
+    if: "!contains(github.event.head_commit.message, 'ci ignore')"
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3.3.0
+
+      - name: Setup PHP 8.0
+        uses: shivammathur/setup-php@2.24.0
+        with:
+          php-version: 8.0
+          tools: composer
+          extensions: yaml pthreads sockets mysqli zlib
+        env:
+          COMPOSER_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Composer
+        run: |
+          composer update --no-interaction --ignore-platform-reqs
+          composer install --no-suggest --no-interaction --ignore-platform-reqs
+
+      - name: "Get data"
+        id: metadata
+        run: |
+          echo "VERSION=$(php -r 'echo explode("+", explode("-", yaml_parse_file(getcwd() . DIRECTORY_SEPARATOR . "plugin.yml")["version"])[0])[0];')" >> $GITHUB_OUTPUT
+          echo "FULL_VERSION=$(php -r 'echo yaml_parse_file(getcwd() . DIRECTORY_SEPARATOR .                                "plugin.yml")["version"];')" >> $GITHUB_OUTPUT
+          echo "NAME=$(php -r 'echo yaml_parse_file(getcwd() . DIRECTORY_SEPARATOR .                                                 "plugin.yml")["name"];')" >> $GITHUB_OUTPUT
+
+      - name: "Build phar"
+        run: "php -dphar.readonly=0 build.php"
+
+      - name: "Create Release"
+        uses: "marvinpinto/action-automatic-releases@latest"
+        with:
+          repo_token: "${{ secrets.GITHUB_TOKEN }}"
+          automatic_release_tag: "dev"
+          prerelease: true
+          title: "Development release v${{ steps.metadata.outputs.VERSION }}"
+          files: |
+            *.phar
