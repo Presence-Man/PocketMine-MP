@@ -1,7 +1,8 @@
 name: "Presence-Man"
 version: "1.0.0"
-api: [ "4.0.0" ]
+api: [ "5.0.0" ]
 main: xxAROX\PresenceMan\PresenceMan
 description: "Presence-Man client for pocketmine-mp to support this server in discord rich-presence."
-website: "https://github.com/xxAROX"
+website: "https://github.com/Presence-Man"
 author: "xxAROX"
+prefix: "Presence-Man"
