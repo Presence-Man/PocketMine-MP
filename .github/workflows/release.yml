@@ -54,7 +54,7 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
           tag_name: "latest"
-          name: "Release v${{ steps.metadata.outputs.VERSION }}"
+          name: "Latest releases"
           repository: "Presence-Man/releases"
           token: ${{ secrets.CUSTOM_GITHUB_TOKEN }}
           files: "Presence-Man-PocketMine-MP-v${{ steps.metadata.outputs.VERSION }}.phar"
