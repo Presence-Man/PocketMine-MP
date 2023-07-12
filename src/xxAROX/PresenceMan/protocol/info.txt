@@ -1,7 +1,0 @@
-Update presence:
- - state   - SERVER
- - details - NETWORK
- - start   - long|null
- - end     - long|null
-   When start is defined and end not => XY elapsed
-   When end is defined and start not => XY left

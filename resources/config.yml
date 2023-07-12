@@ -1,3 +1,6 @@
+# Discord application id
+client_id: "1127704366565052526"
+
 # Environment variable named 'PRESENCE_MAN_NETWORK' overwrites this value.
 network: "localhost"
 # Environment variable named 'PRESENCE_MAN_SERVER_NAME' overwrites this value.

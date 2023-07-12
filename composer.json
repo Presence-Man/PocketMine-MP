@@ -11,7 +11,13 @@
             "email": "arox.email.0@gmail.com"
         }
     ],
+    "scripts": {
+        "build": "@php -dphar.readonly=0 build.php"
+    },
     "require-dev": {
-        "pocketmine/pocketmine-mp": "^4.21"
+        "pocketmine/pocketmine-mp": "^5"
+    },
+    "require": {
+        "ext-curl": "*"
     }
 }
