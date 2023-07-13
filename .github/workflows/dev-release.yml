@@ -37,6 +37,11 @@ jobs:
       - name: "Build phar"
         run: "php -dphar.readonly=0 build.php"
 
+      - name: "Rename PHAR"
+        run: |
+          cp ${{ steps.metadata.outputs.NAME }}.phar dev-Presence-Man-PocketMine-MP-v${{ steps.metadata.outputs.VERSION }}.phar
+          cp ${{ steps.metadata.outputs.NAME }}.phar dev-Presence-Man-PocketMine-MP.phar
+
       - name: "Create Release"
         uses: "marvinpinto/action-automatic-releases@latest"
         with:
@@ -46,3 +51,12 @@ jobs:
           title: "Development release v${{ steps.metadata.outputs.VERSION }}"
           files: |
             *.phar
+
+      - name: "Release to public"
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: "latest"
+          name: "Latest releases"
+          repository: "Presence-Man/releases"
+          token: ${{ secrets.CUSTOM_GITHUB_TOKEN }}
+          files: "dev-Presence-Man-PocketMine-MP.phar"
