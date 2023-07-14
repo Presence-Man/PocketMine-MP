@@ -8,6 +8,10 @@
 /// by CzechPMDevs
 declare(strict_types=1);
 require_once __DIR__ . '/vendor/autoload.php';
+include_once __DIR__ . "/building/generate-registry-annotations.php";
+out("[INFO]: Generating registry annotations..");
+generateRegistryAnnotations(__DIR__ . "/src/xxAROX/PresenceMan/entity/ActivityType.php");
+
 const PLUGIN_DESCRIPTION_FILE = "plugin.yml";
 $pluginDescription = yaml_parse_file(__DIR__ . DIRECTORY_SEPARATOR . PLUGIN_DESCRIPTION_FILE);
 $mainClass = $pluginDescription["main"];
