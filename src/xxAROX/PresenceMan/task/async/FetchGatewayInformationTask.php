@@ -1,6 +1,7 @@
 <?php
 declare(strict_types=1);
 namespace xxAROX\PresenceMan\task\async;
+use Closure;
 use GlobalLogger;
 use JsonException;
 use pocketmine\scheduler\AsyncTask;
@@ -9,6 +10,7 @@ use pocketmine\utils\Internet;
 use pocketmine\utils\InternetException;
 use xxAROX\PresenceMan\entity\Gateway;
 use xxAROX\PresenceMan\PresenceMan;
+use xxAROX\PresenceMan\task\ReconnectingTask;
 
 
 /**
@@ -41,8 +43,13 @@ class FetchGatewayInformationTask extends AsyncTask{
 		Gateway::$protocol = ((string) $result["protocol"]) ?? Gateway::$protocol;
 		Gateway::$address = ((string) $result["address"]) ?? Gateway::$address;
 		Gateway::$port = ((int) $result["port"]) ?? Gateway::$port;
-		Server::getInstance()->getAsyncPool()->submitTask(new class(Gateway::getUrl()) extends AsyncTask{
-			public function __construct(private string $url){
+		PresenceMan::getInstance()->getLogger()->notice("Connected to backend!");
+	}
+
+	public static function ping_backend(Closure $callback): void{
+		if (ReconnectingTask::$active) return;
+		Server::getInstance()->getAsyncPool()->submitTask(new class(Gateway::getUrl(), $callback) extends AsyncTask{
+			public function __construct(private string $url, private Closure $callback){
 			}
 			public function onRun(): void{
 				try {
@@ -57,12 +64,13 @@ class FetchGatewayInformationTask extends AsyncTask{
 				$success = $this->getResult();
 				if (!$success) {
 					Gateway::$broken = true;
-					PresenceMan::getInstance()->getLogger()->critical("Presence-Man backend-server is not reachable, disabling..");
-					Server::getInstance()->getPluginManager()->disablePlugin(PresenceMan::getInstance());
+					ReconnectingTask::activate();
 				} else {
-					PresenceMan::getInstance()->getLogger()->info("Presence-Man backend located at: " . Gateway::getUrl());
+					ReconnectingTask::deactivate();
+					PresenceMan::getInstance()->getLogger()->debug("Presence-Man backend located at: " . Gateway::getUrl());
 					PresenceMan::getInstance()->getLogger()->notice("This server will be displayed as " . PresenceMan::$SERVER . " on " . PresenceMan::$NETWORK . " in presences!");
 				}
+				($this->callback)($success);
 			}
 		});
 	}

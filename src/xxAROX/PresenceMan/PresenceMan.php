@@ -38,6 +38,7 @@ final class PresenceMan extends PluginBase {
 
     public function onEnable(): void{
 		// NOTE: fetch backend ip
+		$this->getServer()->getPluginManager()->registerEvents(new EventListener(), $this);
 		$this->getServer()->getAsyncPool()->submitTask(new FetchGatewayInformationTask());
     }
 }

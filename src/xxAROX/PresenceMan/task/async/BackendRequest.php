@@ -23,6 +23,7 @@ use xxAROX\PresenceMan\PresenceMan;
  * @project Presence-Man | PocketMine-MP
  */
 class BackendRequest extends AsyncTask{
+	private string $request;
 	protected string $url;
 
 	/**
@@ -32,7 +33,8 @@ class BackendRequest extends AsyncTask{
 	 * @param Closure<InternetRequestResult> $onError
 	 * @param int $timeout
 	 */
-	public function __construct(private ApiRequest $request, private Closure $onResponse, private Closure $onError, private int $timeout = 5){
+	public function __construct(ApiRequest $request, private Closure $onResponse, private Closure $onError, private int $timeout = 5){
+		$this->request = $request->serialize();
 		$this->url = Gateway::getUrl();
 		Utils::validateCallableSignature(function (array $response): void{}, $this->onResponse);
 		Utils::validateCallableSignature(function (InternetRequestResult $response): void{}, $this->onError);
@@ -41,8 +43,9 @@ class BackendRequest extends AsyncTask{
 	public function onRun(): void{
 		if (!Internet::$online) throw new InternetException("Cannot execute web request while offline");
 		$headers = [];
-		foreach ($this->request->getHeaders() as $hk => $hv) $headers[] = $hk . ": " . $hv;
-		$ch = curl_init($this->url . $this->request->getUri());
+		$request = ApiRequest::deserialize($this->request);
+		foreach ($request->getHeaders() as $hk => $hv) $headers[] = $hk . ": " . $hv;
+		$ch = curl_init($this->url . $request->getUri());
 
 		curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 2);
 		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
@@ -56,9 +59,9 @@ class BackendRequest extends AsyncTask{
 		curl_setopt($ch, CURLOPT_HTTPHEADER, array_merge(["Content-Type: application/json"], $headers));
 		curl_setopt($ch, CURLOPT_HEADER, true);
 
-		if ($this->request->isPostMethod()) {
+		if ($request->isPostMethod()) {
 			curl_setopt($ch, CURLOPT_POST,1);
-			curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($this->request->getBody()));
+			curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($request->getBody()));
 		}
 		try {
 			$raw = curl_exec($ch);
@@ -87,6 +90,7 @@ class BackendRequest extends AsyncTask{
 	}
 
 	public function onCompletion(): void{
+		$request = ApiRequest::deserialize($this->request);
 		/** @var InternetRequestResult $result */
 		if (!is_null($result = $this->getResult())) {
 			if (in_array($result->getCode(), range(100, 399))) { // Good
@@ -94,18 +98,18 @@ class BackendRequest extends AsyncTask{
 					$result = json_decode($result->getBody(), true, 512, JSON_THROW_ON_ERROR);
 					($this->onResponse)($result);
 				} catch (Throwable $e) {
-					PresenceMan::getInstance()->getLogger()->error($this->url . $this->request->getUri());
+					PresenceMan::getInstance()->getLogger()->error($this->url . $request->getUri());
 					PresenceMan::getInstance()->getLogger()->logException($e);
 				}
 			} else if (in_array($result->getCode(), range(400, 499))) { // Client-Errors
-				PresenceMan::getInstance()->getLogger()->error("[CLIENT-ERROR] [" .$this->request->getUri() . "]: " . $result->getBody());
+				PresenceMan::getInstance()->getLogger()->error("[CLIENT-ERROR] [" .$request->getUri() . "]: " . $result->getBody());
 				($this->onError)($result);
 			} else if (in_array($result->getCode(), range(500, 599))) { // Server-Errors
-				PresenceMan::getInstance()->getLogger()->error("[API-ERROR] [" .$this->request->getUri() . "]: " . $result->getBody());
+				PresenceMan::getInstance()->getLogger()->error("[API-ERROR] [" .$request->getUri() . "]: " . $result->getBody());
 				($this->onError)($result);
 			}
 		} else {
-			PresenceMan::getInstance()->getLogger()->error("[JUST-IN-CASE-ERROR] [" . $this->request->getUri() . "]: got null, that's not good");
+			PresenceMan::getInstance()->getLogger()->error("[JUST-IN-CASE-ERROR] [" . $request->getUri() . "]: got null, that's not good");
 		}
 	}
 }

@@ -11,7 +11,7 @@ namespace xxAROX\PresenceMan\entity;
  */
 final class ApiRequest{
 	private array $headers = [];
-	private array $body;
+	private array $body = [];
 	private bool $post_method;
 
 	static string $URI_CHECKOUT = "/";
@@ -27,6 +27,23 @@ final class ApiRequest{
 	public function __construct(private string $uri, array $body = [], bool $post_method = false){
 		$this->body = $body;
 		$this->post_method = $post_method;
+	}
+
+	public function serialize(): string{
+		$arr = [
+			"uri" => $this->uri,
+			"headers" => $this->headers,
+			"body" => $this->body,
+			"post_method" => $this->post_method,
+		];
+		return json_encode($arr);
+	}
+
+	public static function deserialize(string $str): self{
+		$json = json_decode($str, true);
+		$self = new self($json["uri"], ($json["body"] ?? []), (bool) $json["post_method"], );
+		$self->headers = $json["headers"] ?? [];
+		return $self;
 	}
 
 	/**
