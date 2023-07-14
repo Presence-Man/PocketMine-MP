@@ -4,7 +4,7 @@ client_id: "1127704366565052526"
 
 # Environment variable named 'PRESENCE_MAN_NETWORK' overwrites this value.
 network: "localhost"
-# Environment variable named 'PRESENCE_MAN_SERVER_NAME' overwrites this value.
+# Environment variable named 'PRESENCE_MAN_SERVER' overwrites this value.
 server: "Development-Server"
 
 # Server icon asset name
