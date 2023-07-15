@@ -3,7 +3,9 @@ namespace xxAROX\PresenceMan;
 use pocketmine\player\Player;
 use pocketmine\plugin\PluginBase;
 use pocketmine\Server;
+use pocketmine\utils\Internet;
 use pocketmine\utils\SingletonTrait;
+use xxAROX\PresenceMan\entity\ActivityType;
 use xxAROX\PresenceMan\entity\ApiActivity;
 use xxAROX\PresenceMan\entity\ApiRequest;
 use xxAROX\PresenceMan\task\async\BackendRequest;
@@ -24,15 +26,13 @@ final class PresenceMan extends PluginBase {
 		setInstance as private;
 	}
     public static ?string $CLIENT_ID = null;
-    public static string $NETWORK = "undefined";
+	public static string $NETWORK = "undefined";
     public static string $SERVER = "undefined";
-    public static ?string $DEFAULT_LARGE_IMAGE_KEY = null;
-    public static ?string $DEFAULT_LARGE_IMAGE_TEXT = null;
-    public static ?string $DEFAULT_SMALL_IMAGE_KEY = null;
-    public static ?string $DEFAULT_SMALL_IMAGE_TEXT = null;
+	public static bool $ENABLE_DEFAULT = false;
 
 	/** @var ApiActivity[] */
-	public static array $presences = []; // TODO
+	public static array $presences = [];
+	public static ApiActivity $default;
 
 
     public function onLoad(): void{
@@ -40,12 +40,26 @@ final class PresenceMan extends PluginBase {
         $this->saveResource("config.yml");
         $config = $this->getConfig();
         self::$CLIENT_ID = getenv("PRESENCE_MAN_CLIENT_ID") == false || empty(getenv("PRESENCE_MAN_CLIENT_ID")) ? $config->get("client_id", self::$CLIENT_ID) : getenv("PRESENCE_MAN_CLIENT_ID");
-        self::$NETWORK = getenv("PRESENCE_MAN_NETWORK") == false || empty(getenv("PRESENCE_MAN_NETWORK")) ? $config->get("network", self::$NETWORK) : getenv("PRESENCE_MAN_NETWORK");
+		self::$NETWORK = getenv("PRESENCE_MAN_NETWORK") == false || empty(getenv("PRESENCE_MAN_NETWORK")) ? $config->get("network", self::$NETWORK) : getenv("PRESENCE_MAN_NETWORK");
         self::$SERVER = getenv("PRESENCE_MAN_SERVER") == false || empty(getenv("PRESENCE_MAN_SERVER")) ? $config->get("server", self::$SERVER) : getenv("PRESENCE_MAN_SERVER");
-        self::$DEFAULT_LARGE_IMAGE_KEY = getenv("PRESENCE_MAN_DEFAULT_LARGE_IMAGE_KEY") == false || empty(getenv("PRESENCE_MAN_DEFAULT_LARGE_IMAGE_KEY")) ? $config->get("default_large_image_key", self::$DEFAULT_LARGE_IMAGE_KEY) : getenv("PRESENCE_MAN_DEFAULT_LARGE_IMAGE_KEY");
-        self::$DEFAULT_LARGE_IMAGE_TEXT = getenv("PRESENCE_MAN_DEFAULT_LARGE_IMAGE_TEXT") == false || empty(getenv("PRESENCE_MAN_DEFAULT_LARGE_IMAGE_TEXT")) ? $config->get("default_large_image_text", self::$DEFAULT_LARGE_IMAGE_TEXT) : getenv("PRESENCE_MAN_DEFAULT_LARGE_IMAGE_TEXT");
-        self::$DEFAULT_SMALL_IMAGE_KEY = getenv("PRESENCE_MAN_DEFAULT_SMALL_IMAGE_KEY") == false || empty(getenv("PRESENCE_MAN_DEFAULT_SMALL_IMAGE_KEY")) ? $config->get("default_small_image_key", self::$DEFAULT_SMALL_IMAGE_KEY) : getenv("PRESENCE_MAN_DEFAULT_SMALL_IMAGE_KEY");
-        self::$DEFAULT_SMALL_IMAGE_TEXT = getenv("PRESENCE_MAN_DEFAULT_SMALL_IMAGE_TEXT") == false || empty(getenv("PRESENCE_MAN_DEFAULT_SMALL_IMAGE_TEXT")) ? $config->get("default_small_image_text", self::$DEFAULT_SMALL_IMAGE_TEXT) : getenv("PRESENCE_MAN_DEFAULT_SMALL_IMAGE_TEXT");
+		self::$ENABLE_DEFAULT = getenv("PRESENCE_MAN_DEFAULT_ENABLED") == false || empty(getenv("PRESENCE_MAN_DEFAULT_ENABLED")) ? $config->get("enable_default", self::$ENABLE_DEFAULT) : getenv("PRESENCE_MAN_DEFAULT_ENABLED");
+
+		$DEFAULT_STATE = getenv("PRESENCE_MAN_DEFAULT_STATE") == false || empty(getenv("PRESENCE_MAN_DEFAULT_STATE")) ? $config->get("default_state", null) : getenv("PRESENCE_MAN_DEFAULT_STATE");
+		$DEFAULT_DETAILS = getenv("PRESENCE_MAN_DEFAULT_DETAILS") == false || empty(getenv("PRESENCE_MAN_DEFAULT_DETAILS")) ? $config->get("default_details", null) : getenv("PRESENCE_MAN_DEFAULT_DETAILS");
+		$DEFAULT_LARGE_IMAGE_KEY = getenv("PRESENCE_MAN_DEFAULT_LARGE_IMAGE_KEY") == false || empty(getenv("PRESENCE_MAN_DEFAULT_LARGE_IMAGE_KEY")) ? $config->get("default_large_image_key", null) : getenv("PRESENCE_MAN_DEFAULT_LARGE_IMAGE_KEY");
+        $DEFAULT_LARGE_IMAGE_TEXT = getenv("PRESENCE_MAN_DEFAULT_LARGE_IMAGE_TEXT") == false || empty(getenv("PRESENCE_MAN_DEFAULT_LARGE_IMAGE_TEXT")) ? $config->get("default_large_image_text", null) : getenv("PRESENCE_MAN_DEFAULT_LARGE_IMAGE_TEXT");
+        $DEFAULT_SMALL_IMAGE_KEY = getenv("PRESENCE_MAN_DEFAULT_SMALL_IMAGE_KEY") == false || empty(getenv("PRESENCE_MAN_DEFAULT_SMALL_IMAGE_KEY")) ? $config->get("default_small_image_key", null) : getenv("PRESENCE_MAN_DEFAULT_SMALL_IMAGE_KEY");
+        $DEFAULT_SMALL_IMAGE_TEXT = getenv("PRESENCE_MAN_DEFAULT_SMALL_IMAGE_TEXT") == false || empty(getenv("PRESENCE_MAN_DEFAULT_SMALL_IMAGE_TEXT")) ? $config->get("default_small_image_text", null) : getenv("PRESENCE_MAN_DEFAULT_SMALL_IMAGE_TEXT");
+		self::$default = new ApiActivity(
+			ActivityType::PLAYING(),
+			$DEFAULT_STATE,
+			$DEFAULT_DETAILS,
+			null,
+			$DEFAULT_LARGE_IMAGE_KEY,
+			$DEFAULT_LARGE_IMAGE_TEXT,
+			$DEFAULT_SMALL_IMAGE_KEY,
+			$DEFAULT_SMALL_IMAGE_TEXT
+		);
     }
 
     public function onEnable(): void{
@@ -59,6 +73,11 @@ final class PresenceMan extends PluginBase {
 			"ip" => $ip,
 			"xuid" => $player->getXuid(),
 			"api_activity" => $activity,
+			"connection" => [
+				"ip" => Internet::getIP(),
+				"network" => PresenceMan::$NETWORK,
+				"server" => PresenceMan::$SERVER,
+			]
 		]);
 		Server::getInstance()->getAsyncPool()->submitTask(new BackendRequest(
 			$request,

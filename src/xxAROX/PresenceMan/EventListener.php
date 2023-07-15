@@ -20,6 +20,7 @@ use xxAROX\PresenceMan\task\async\BackendRequest;
  */
 class EventListener implements Listener{
 	public function PlayerLoginEvent(PlayerLoginEvent $event): void{
+		if (!PresenceMan::$ENABLE_DEFAULT) return;
 		PresenceMan::setActivity($event->getPlayer(), ApiActivity::default_activity());
 	}
 	public function PlayerQuitEvent(PlayerQuitEvent $event): void{

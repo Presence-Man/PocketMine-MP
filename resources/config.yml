@@ -7,6 +7,20 @@ network: "localhost"
 # Environment variable named 'PRESENCE_MAN_SERVER' overwrites this value.
 server: "Development-Server"
 
+
+
+# Enable default activity
+# Environment variable named 'PRESENCE_MAN_DEFAULT_ENABLED' overwrites this value.
+enable_default: true
+
+# Network name
+# Environment variable named 'PRESENCE_MAN_DEFAULT_STATE' overwrites this value.
+default_state: "Playing {server} on {network}"
+
+# Server name
+# Environment variable named 'PRESENCE_MAN_DEFAULT_DETAILS' overwrites this value.
+default_details: ""
+
 # Server icon asset name
 # Environment variable named 'PRESENCE_MAN_DEFAULT_LARGE_IMAGE_KEY' overwrites this value.
 default_large_image_key: ~
