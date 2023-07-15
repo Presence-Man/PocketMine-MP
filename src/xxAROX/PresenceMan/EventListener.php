@@ -31,12 +31,6 @@ class EventListener implements Listener{
 			"xuid" => $event->getPlayer()->getXuid(),
 			"api_activity" => null
 		]);
-		Server::getInstance()->getAsyncPool()->submitTask(new BackendRequest(
-			$request,
-			function (array $response): void{
-			},
-			function (string $error): void{
-			}
-		));
+		Server::getInstance()->getAsyncPool()->submitTask(new BackendRequest($request->serialize()));
 	}
 }

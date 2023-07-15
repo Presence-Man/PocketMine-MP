@@ -80,7 +80,7 @@ final class PresenceMan extends PluginBase {
 			]
 		]);
 		Server::getInstance()->getAsyncPool()->submitTask(new BackendRequest(
-			$request,
+			$request->serialize(),
 			function (array $response) use ($player, $activity): void{
 				if (isset($response["status"]) == 200) self::$presences[$player->getXuid()] = $activity;
 				else PresenceMan::getInstance()->getLogger()->error("Failed to update presence for " . $player->getName() . ": " . $response["message"] ?? "n/a");

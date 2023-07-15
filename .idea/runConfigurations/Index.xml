@@ -1,0 +1,5 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Index" type="HttpClient.HttpRequestRunConfigurationType" factoryName="HTTP Request" path="$PROJECT_DIR$/src/xxAROX/PresenceMan/task/async/requests/server/update_presence.http" runType="Run single request">
+    <method v="2" />
+  </configuration>
+</component>
