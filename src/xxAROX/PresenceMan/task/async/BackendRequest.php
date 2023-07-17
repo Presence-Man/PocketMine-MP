@@ -3,6 +3,7 @@ declare(strict_types=1);
 namespace xxAROX\PresenceMan\task\async;
 use Closure;
 use pocketmine\scheduler\AsyncTask;
+use pocketmine\utils\AssumptionFailedError;
 use pocketmine\utils\Internet;
 use pocketmine\utils\InternetException;
 use pocketmine\utils\InternetRequestResult;
@@ -50,27 +51,51 @@ class BackendRequest extends AsyncTask{
 		$headers = [];
 		$request = ApiRequest::deserialize($this->request);
 		foreach ($request->getHeaders() as $hk => $hv) $headers[] = $hk . ": " . $hv;
-		var_dump($this->url . $request->getUri());
-		$url = $this->url . $request->getUri();
 
-		if ($request->isPostMethod()) {
-			$result = Internet::postURL(
-				$url,
-				json_encode($request->getBody()),
-				$this->timeout,
-				$headers,
-				$err
-			);
-		} else {
-			$result = Internet::getURL(
-				$url,
-				$this->timeout,
-				$headers,
-				$err
-			);
+		$ch = curl_init($this->url . $this->request->getUri());
+
+		curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 2);
+		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+		curl_setopt($ch, CURLOPT_FORBID_REUSE, 1);
+		curl_setopt($ch, CURLOPT_FRESH_CONNECT, 1);
+		curl_setopt($ch, CURLOPT_AUTOREFERER, true);
+		curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+		curl_setopt($ch, CURLOPT_CONNECTTIMEOUT_MS, (int) ($this->timeout * 1000));
+		curl_setopt($ch, CURLOPT_TIMEOUT_MS, (int) ($this->timeout * 1000));
+		curl_setopt($ch, CURLOPT_HTTPHEADER, array_merge(["Content-Type: application/json"], $headers));
+		curl_setopt($ch, CURLOPT_HEADER, true);
+
+		if ($this->request->isPostMethod()) {
+			curl_setopt($ch, CURLOPT_POST,1);
+			curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($this->request->getBody()));
 		}
-		if ($result == null && $err) throw new InternetException($err);
-		else $this->setResult($result);
+
+		try {
+			$raw = curl_exec($ch);
+			if ($raw === false) throw new InternetException(curl_error($ch));
+			if (!is_string($raw)) throw new AssumptionFailedError("curl_exec() should return string|false when CURLOPT_RETURNTRANSFER is set");
+			$httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+			if (!is_int($httpCode)) throw new AssumptionFailedError("curl_getinfo(CURLINFO_HTTP_CODE) always returns int");
+			$headerSize = curl_getinfo($ch, CURLINFO_HEADER_SIZE);
+			$rawHeaders = substr($raw, 0, $headerSize);
+			$body = substr($raw, $headerSize);
+			$headers = [];
+			foreach (explode("\r\n\r\n", $rawHeaders) as $rawHeaderGroup) {
+				$headerGroup = [];
+				foreach (explode("\r\n", $rawHeaderGroup) as $line) {
+					$nameValue = explode(":", $line, 2);
+					if (isset($nameValue[1])) $headerGroup[trim(strtolower($nameValue[0]))] = trim($nameValue[1]);
+				}
+				$headers[] = $headerGroup;
+			}
+			$this->setResult(new InternetRequestResult($headers, $body, $httpCode));
+		} catch (InternetException $e) {
+			if (str_starts_with($e->getMessage(), "Failed to connect to ")) throw new InternetException("Failed to connect to " . $this->url . $request->getUri());
+			$this->setResult(null);
+		} finally {
+			curl_close($ch);
+		}
 	}
 
 	public function onCompletion(): void{

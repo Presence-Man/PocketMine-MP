@@ -36,10 +36,15 @@ class FetchGatewayInformationTask extends AsyncTask{
 			$this->setResult($json);
 		} catch (JsonException $e) {
 			GlobalLogger::get()->logException(new InternetException("Error while fetching gateway information: {$e->getMessage()}"));
+			$this->setResult(null);
 		}
 	}
 	public function onCompletion(): void{
 		$result = $this->getResult();
+		if ($result == null) {
+			PresenceMan::getInstance()->getLogger()->notice("Cannot connect to backend!");
+			return;
+		}
 		Gateway::$protocol = ((string) $result["protocol"]) ?? Gateway::$protocol;
 		Gateway::$address = ((string) $result["address"]) ?? Gateway::$address;
 		Gateway::$port = ((int) $result["port"]) ?? Gateway::$port;
