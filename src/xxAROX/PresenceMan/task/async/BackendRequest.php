@@ -52,7 +52,7 @@ class BackendRequest extends AsyncTask{
 		$request = ApiRequest::deserialize($this->request);
 		foreach ($request->getHeaders() as $hk => $hv) $headers[] = $hk . ": " . $hv;
 
-		$ch = curl_init($this->url . $this->request->getUri());
+		$ch = curl_init($this->url . $request->getUri());
 
 		curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 2);
 		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
@@ -66,9 +66,9 @@ class BackendRequest extends AsyncTask{
 		curl_setopt($ch, CURLOPT_HTTPHEADER, array_merge(["Content-Type: application/json"], $headers));
 		curl_setopt($ch, CURLOPT_HEADER, true);
 
-		if ($this->request->isPostMethod()) {
+		if ($request->isPostMethod()) {
 			curl_setopt($ch, CURLOPT_POST,1);
-			curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($this->request->getBody()));
+			curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($request->getBody()));
 		}
 
 		try {
@@ -117,8 +117,6 @@ class BackendRequest extends AsyncTask{
 				PresenceMan::getInstance()->getLogger()->error("[API-ERROR] [" .$request->getUri() . "]: " . $result->getBody());
 				if ($this->onError != null) ($this->onError)($result);
 			}
-		} else {
-			PresenceMan::getInstance()->getLogger()->error("[JUST-IN-CASE-ERROR] [" . $request->getUri() . "]: got null, that's not good");
-		}
+		} else PresenceMan::getInstance()->getLogger()->error("[JUST-IN-CASE-ERROR] [" . $request->getUri() . "]: got null, that's not good");
 	}
 }
