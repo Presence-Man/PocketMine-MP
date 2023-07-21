@@ -32,7 +32,7 @@ class FetchGatewayInformationTask extends AsyncTask{
 				Server::getInstance()->getPluginManager()->disablePlugin(PresenceMan::getInstance());
 			}
 			$json = json_decode($response->getBody(), true, 512, JSON_THROW_ON_ERROR);
-			if ($response->getCode() != 200) throw new InternetException($json["message"] ?? "{$response->getCode()} status code");
+			if ($response->getCode() != 200) throw new InternetException($json["message"] ?? "Couldn't fetch gateway data");
 			$this->setResult($json);
 		} catch (JsonException $e) {
 			GlobalLogger::get()->logException(new InternetException("Error while fetching gateway information: {$e->getMessage()}"));
@@ -42,15 +42,23 @@ class FetchGatewayInformationTask extends AsyncTask{
 	public function onCompletion(): void{
 		$result = $this->getResult();
 		if ($result == null) {
-			PresenceMan::getInstance()->getLogger()->notice("Cannot connect to backend!");
+			PresenceMan::getInstance()->getLogger()->warning("Couldn't fetch gateway data!");
 			return;
 		}
 		Gateway::$protocol = ((string) $result["protocol"]) ?? Gateway::$protocol;
 		Gateway::$address = ((string) $result["address"]) ?? Gateway::$address;
 		Gateway::$port = ((int) $result["port"]) ?? Gateway::$port;
-		PresenceMan::getInstance()->getLogger()->notice("Connected to backend!");
+		self::ping_backend(function (bool $success): void{
+			if (!$success) PresenceMan::getInstance()->getLogger()->error("Error while connecting to backend-server!");
+		});
 	}
 
+	/**
+	 * Function ping_backend
+	 * @param Closure<bool> $callback
+	 * @return void
+	 * @internal
+	 */
 	public static function ping_backend(Closure $callback): void{
 		if (ReconnectingTask::$active) return;
 		Server::getInstance()->getAsyncPool()->submitTask(new class(Gateway::getUrl(), $callback) extends AsyncTask{
@@ -59,8 +67,7 @@ class FetchGatewayInformationTask extends AsyncTask{
 			public function onRun(): void{
 				try {
 					$result = Internet::getURL($this->url);
-					if ($result != null && $result->getCode() == 200) $this->setResult(true);
-					else $this->setResult(false);
+					$this->setResult($result != null && $result->getCode() == 200);
 				} catch (InternetException $e) {
 					$this->setResult(false);
 				}
@@ -72,8 +79,7 @@ class FetchGatewayInformationTask extends AsyncTask{
 					ReconnectingTask::activate();
 				} else {
 					ReconnectingTask::deactivate();
-					PresenceMan::getInstance()->getLogger()->debug("Presence-Man backend located at: " . Gateway::getUrl());
-					PresenceMan::getInstance()->getLogger()->notice("This server will be displayed as " . PresenceMan::$SERVER . " on " . PresenceMan::$NETWORK . " in presences!");
+					PresenceMan::getInstance()->getLogger()->notice("This server will be displayed as '" . PresenceMan::$SERVER . "' on '" . PresenceMan::$NETWORK . "' network in presences!");
 				}
 				($this->callback)($success);
 			}

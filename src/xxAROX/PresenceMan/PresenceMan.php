@@ -62,7 +62,7 @@ final class PresenceMan extends PluginBase {
 		);
     }
 
-    public function onEnable(): void{
+    protected function onEnable(): void{
 		$this->getServer()->getPluginManager()->registerEvents(new EventListener(), $this);
 		$this->getServer()->getAsyncPool()->submitTask(new FetchGatewayInformationTask());
     }
