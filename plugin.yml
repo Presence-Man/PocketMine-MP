@@ -6,3 +6,5 @@ description: "Presence-Man client for pocketmine-mp to support this server in di
 website: "https://github.com/Presence-Man"
 author: "xxAROX"
 prefix: "Presence-Man"
+softdepend:
+  - "WD_LoginDataFix"

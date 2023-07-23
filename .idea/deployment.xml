@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
-  <component name="PublishConfigData" remoteFilesAllowedToDisappearOnAutoupload="false">
+  <component name="PublishConfigData" serverName="xxAROX" remoteFilesAllowedToDisappearOnAutoupload="false">
     <serverData>
       <paths name="Australien">
         <serverdata>
@@ -14,6 +14,18 @@
           <mappings>
             <mapping local="$PROJECT_DIR$" web="/" />
           </mappings>
+        </serverdata>
+      </paths>
+      <paths name="xxAROX">
+        <serverdata>
+          <mappings>
+            <mapping deploy="/home/Presence-Man/pmmp/plugins" local="$PROJECT_DIR$/out" web="/" />
+          </mappings>
+          <excludedPaths>
+            <excludedPath local="true" path="$PROJECT_DIR$/out/resources" />
+            <excludedPath local="true" path="$PROJECT_DIR$/out/src" />
+            <excludedPath local="true" path="$PROJECT_DIR$/out/plugin.yml" />
+          </excludedPaths>
         </serverdata>
       </paths>
     </serverData>
