@@ -33,8 +33,7 @@ final class PresenceMan extends PluginBase {
 	public static array $presences = [];
 	public static ApiActivity $default;
 
-
-    public function onLoad(): void{
+	public function onLoad(): void{
 		self::setInstance($this);
         $this->saveResource("config.yml");
         $config = $this->getConfig();
@@ -82,6 +81,25 @@ final class PresenceMan extends PluginBase {
 			},
 			function (): void{
 			}
+		));
+	}
+
+	/**
+	 * Function offline
+	 * @param Player $player
+	 * @return void
+	 * @internal
+	 */
+	public static function offline(Player $player): void{
+		$request = new ApiRequest(ApiRequest::$URI_OFFLINE, [
+			"ip" => $player->getNetworkSession()->getIp(),
+			"xuid" => $player->getXuid()
+		], true);
+		$request->header("Token", self::$TOKEN);
+		Server::getInstance()->getAsyncPool()->submitTask(new BackendRequest(
+			$request->serialize(),
+			function (array $response) use ($player): void{unset(self::$presences[$player->getXuid()]);},
+			function (string $error): void{}
 		));
 	}
 }

@@ -16,7 +16,10 @@ final class ApiRequest{
 	private array $body;
 	private bool $post_method;
 
+	/** @internal */
 	static string $URI_UPDATE_PRESENCE = "/api/v1/servers/update_presence";
+	/** @internal */
+	static string $URI_OFFLINE = "/api/v1/servers/offline";
 
 	/**
 	 * ApiRequest constructor.

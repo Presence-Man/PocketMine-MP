@@ -22,6 +22,6 @@ class EventListener implements Listener{
 	}
 	public function PlayerQuitEvent(PlayerQuitEvent $event): void{
 		unset(PresenceMan::$presences[$event->getPlayer()->getXuid()]);
-		PresenceMan::setActivity($event->getPlayer(), null);
+		PresenceMan::offline($event->getPlayer());
 	}
 }
