@@ -79,7 +79,7 @@ class FetchGatewayInformationTask extends AsyncTask{
 					ReconnectingTask::activate();
 				} else {
 					ReconnectingTask::deactivate();
-					PresenceMan::getInstance()->getLogger()->notice("This server will be displayed as '" . PresenceMan::$SERVER . "' on '" . PresenceMan::$NETWORK . "' network in presences!");
+					PresenceMan::getInstance()->getLogger()->notice("This server will be displayed as '" . PresenceMan::$SERVER . "' in presences!");
 				}
 				($this->callback)($success);
 			}
