@@ -1,9 +1,11 @@
+# Presence-Man token
+# Environment variable named 'PRESENCE_MAN_TOKEN' overwrites this value.
+token: ~
+
 # Discord application id
 # Environment variable named 'PRESENCE_MAN_CLIENT_ID' overwrites this value.
 client_id: "1127704366565052526"
 
-# Environment variable named 'PRESENCE_MAN_NETWORK' overwrites this value.
-network: "localhost"
 # Environment variable named 'PRESENCE_MAN_SERVER' overwrites this value.
 server: "Development-Server"
 

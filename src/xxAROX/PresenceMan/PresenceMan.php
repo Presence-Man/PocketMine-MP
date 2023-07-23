@@ -3,7 +3,6 @@ namespace xxAROX\PresenceMan;
 use pocketmine\player\Player;
 use pocketmine\plugin\PluginBase;
 use pocketmine\Server;
-use pocketmine\utils\Internet;
 use pocketmine\utils\SingletonTrait;
 use xxAROX\PresenceMan\entity\ActivityType;
 use xxAROX\PresenceMan\entity\ApiActivity;
@@ -25,8 +24,8 @@ final class PresenceMan extends PluginBase {
 		reset as private;
 		setInstance as private;
 	}
-    public static ?string $CLIENT_ID = null;
-	public static string $NETWORK = "undefined";
+	private static string $TOKEN = "undefined";
+	public static ?string $CLIENT_ID = null;
     public static string $SERVER = "undefined";
 	public static bool $ENABLE_DEFAULT = false;
 
@@ -39,9 +38,9 @@ final class PresenceMan extends PluginBase {
 		self::setInstance($this);
         $this->saveResource("config.yml");
         $config = $this->getConfig();
-        self::$CLIENT_ID = getenv("PRESENCE_MAN_CLIENT_ID") == false || empty(getenv("PRESENCE_MAN_CLIENT_ID")) ? $config->get("client_id", self::$CLIENT_ID) : getenv("PRESENCE_MAN_CLIENT_ID");
-		self::$NETWORK = getenv("PRESENCE_MAN_NETWORK") == false || empty(getenv("PRESENCE_MAN_NETWORK")) ? $config->get("network", self::$NETWORK) : getenv("PRESENCE_MAN_NETWORK");
-        self::$SERVER = getenv("PRESENCE_MAN_SERVER") == false || empty(getenv("PRESENCE_MAN_SERVER")) ? $config->get("server", self::$SERVER) : getenv("PRESENCE_MAN_SERVER");
+		self::$TOKEN = getenv("PRESENCE_MAN_TOKEN") == false || empty(getenv("PRESENCE_MAN_TOKEN")) ? $config->get("token", self::$TOKEN) : getenv("PRESENCE_MAN_TOKEN");
+		self::$CLIENT_ID = getenv("PRESENCE_MAN_CLIENT_ID") == false || empty(getenv("PRESENCE_MAN_CLIENT_ID")) ? $config->get("client_id", self::$CLIENT_ID) : getenv("PRESENCE_MAN_CLIENT_ID");
+		self::$SERVER = getenv("PRESENCE_MAN_SERVER") == false || empty(getenv("PRESENCE_MAN_SERVER")) ? $config->get("server", self::$SERVER) : getenv("PRESENCE_MAN_SERVER");
 		self::$ENABLE_DEFAULT = getenv("PRESENCE_MAN_DEFAULT_ENABLED") == false || empty(getenv("PRESENCE_MAN_DEFAULT_ENABLED")) ? $config->get("enable_default", self::$ENABLE_DEFAULT) : getenv("PRESENCE_MAN_DEFAULT_ENABLED");
 
 		$DEFAULT_STATE = getenv("PRESENCE_MAN_DEFAULT_STATE") == false || empty(getenv("PRESENCE_MAN_DEFAULT_STATE")) ? $config->get("default_state", null) : getenv("PRESENCE_MAN_DEFAULT_STATE");
@@ -68,17 +67,13 @@ final class PresenceMan extends PluginBase {
     }
 
 	public static function setActivity(Player $player, ApiActivity $activity): void{
-		$ip = $player->getNetworkSession()->getIp();
 		$request = new ApiRequest(ApiRequest::$URI_UPDATE_PRESENCE, [
-			"ip" => $ip,
+			"ip" => $player->getNetworkSession()->getIp(),
 			"xuid" => $player->getXuid(),
+			"server" => PresenceMan::$SERVER,
 			"api_activity" => $activity,
-			"connection" => [
-				"ip" => Internet::getIP(),
-				"network" => PresenceMan::$NETWORK,
-				"server" => PresenceMan::$SERVER,
-			]
-		]);
+		], true);
+		$request->header("Token", self::$TOKEN);
 		Server::getInstance()->getAsyncPool()->submitTask(new BackendRequest(
 			$request->serialize(),
 			function (array $response) use ($player, $activity): void{
