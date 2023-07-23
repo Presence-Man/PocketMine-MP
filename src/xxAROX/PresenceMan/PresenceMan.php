@@ -66,7 +66,7 @@ final class PresenceMan extends PluginBase {
 		$this->getServer()->getAsyncPool()->submitTask(new FetchGatewayInformationTask());
     }
 
-	public static function setActivity(Player $player, ApiActivity $activity): void{
+	public static function setActivity(Player $player, ?ApiActivity $activity = null): void{
 		$request = new ApiRequest(ApiRequest::$URI_UPDATE_PRESENCE, [
 			"ip" => $player->getNetworkSession()->getIp(),
 			"xuid" => $player->getXuid(),

@@ -10,13 +10,13 @@ namespace xxAROX\PresenceMan\entity;
  * @project Presence-Man | PocketMine-MP
  */
 final class ApiRequest{
-	private array $headers = [];
-	private array $body = [];
+	private array $headers = [
+		"Content-Type" => "application/json"
+	];
+	private array $body;
 	private bool $post_method;
 
-	static string $URI_CHECKOUT = "/";
-	static string $URI_OFFLINE = "/server/offline";
-	static string $URI_UPDATE_PRESENCE = "/server/update_presence";
+	static string $URI_UPDATE_PRESENCE = "/api/v1/servers/update_presence";
 
 	/**
 	 * ApiRequest constructor.
