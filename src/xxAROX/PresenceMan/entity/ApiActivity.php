@@ -43,7 +43,7 @@ final class ApiActivity{
 	public function serialize(): string{
 		$json = [
 			'client_id' => PresenceMan::$CLIENT_ID,
-			'type' => mb_strtoupper($this->type->__toString()),
+			'type' => $this->type->name(),
 			'state' => $this->state,
 			'details' => $this->details,
 			'end' => $this->end,

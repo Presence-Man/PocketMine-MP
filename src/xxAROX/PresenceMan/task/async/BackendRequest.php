@@ -52,7 +52,6 @@ class BackendRequest extends AsyncTask{
 		$request = ApiRequest::deserialize($this->request);
 		foreach ($request->getHeaders() as $hk => $hv) $headers[] = $hk . ": " . $hv;
 		$result = $request->isPostMethod() ? Internet::postURL($this->url . $request->getUri(), json_encode($request->getBody()), 10, $headers, $err) : Internet::getURL($this->url . $request->getUri(), 10, $headers, $err);
-		var_dump($result);
 		$this->setResult($result);
 	}
 
