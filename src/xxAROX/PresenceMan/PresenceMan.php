@@ -70,7 +70,7 @@ final class PresenceMan extends PluginBase {
 			"ip" => $player->getNetworkSession()->getIp(),
 			"xuid" => $player->getXuid(),
 			"server" => PresenceMan::$SERVER,
-			"api_activity" => $activity,
+			"api_activity" => $activity?->serialize(),
 		], true);
 		$request->header("Token", self::$TOKEN);
 		Server::getInstance()->getAsyncPool()->submitTask(new BackendRequest(
@@ -78,8 +78,6 @@ final class PresenceMan extends PluginBase {
 			function (array $response) use ($player, $activity): void{
 				if (isset($response["status"]) == 200) self::$presences[$player->getXuid()] = $activity;
 				else PresenceMan::getInstance()->getLogger()->error("Failed to update presence for " . $player->getName() . ": " . $response["message"] ?? "n/a");
-			},
-			function (): void{
 			}
 		));
 	}
@@ -96,10 +94,11 @@ final class PresenceMan extends PluginBase {
 			"xuid" => $player->getXuid()
 		], true);
 		$request->header("Token", self::$TOKEN);
-		Server::getInstance()->getAsyncPool()->submitTask(new BackendRequest(
+		$task = new BackendRequest(
 			$request->serialize(),
-			function (array $response) use ($player): void{unset(self::$presences[$player->getXuid()]);},
-			function (string $error): void{}
-		));
+			function (array $response) use ($player): void{unset(self::$presences[$player->getXuid()]);}
+		);
+		if (!Server::getInstance()->isRunning()) $task->run();
+		else Server::getInstance()->getAsyncPool()->submitTask($task);
 	}
 }
