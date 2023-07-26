@@ -4,7 +4,7 @@ token: ~
 
 # Discord application id
 # Environment variable named 'PRESENCE_MAN_CLIENT_ID' overwrites this value.
-client_id: "1127704366565052526"
+client_id: "1133823892486623344"
 
 # Environment variable named 'PRESENCE_MAN_SERVER' overwrites this value.
 server: "Development-Server"

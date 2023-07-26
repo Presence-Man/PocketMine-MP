@@ -86,13 +86,13 @@ final class ApiActivity{
 		return PresenceMan::$default;
 	}
 
-	public static function ends_in(int $time, ?ApiRequest $base = null): self{
+	public static function ends_in(int $time, ?ApiActivity $base = null): self{
 		$default = $base ?? self::default_activity();
 		$default->end = $time * 1000;
 		return $default;
 	}
 
-	public static function players_left(int $current_players, int $max_players, ?ApiRequest $base = null): self{
+	public static function players_left(int $current_players, int $max_players, ?ApiActivity $base = null): self{
 		$default = $base ?? self::default_activity();
 		$default->party_player_count = $current_players;
 		$default->party_max_player_count = $max_players;
