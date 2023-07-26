@@ -20,7 +20,6 @@ use pocketmine\utils\EnumTrait;
  * @generate-registry-docblock
  *
  * @method static ActivityType COMPETING()
- * @method static ActivityType CUSTOM()
  * @method static ActivityType LISTENING()
  * @method static ActivityType PLAYING()
  * @method static ActivityType STREAMING()
@@ -36,7 +35,6 @@ class ActivityType{
 		self::_registryRegister("STREAMING", new self("STREAMING"));
 		self::_registryRegister("LISTENING", new self("LISTENING"));
 		self::_registryRegister("UNUSED", new self("UNUSED"));
-		self::_registryRegister("CUSTOM", new self("CUSTOM"));
 		self::_registryRegister("COMPETING", new self("COMPETING"));
 	}
 
