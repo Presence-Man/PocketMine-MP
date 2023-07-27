@@ -1,5 +1,5 @@
 {
-    "name": "presence-man/pmmp",
+    "name": "presence-man/pocketmine-mp",
     "autoload": {
         "psr-4": {
             "xxAROX\\PresenceMan\\": "src/xxAROX/PresenceMan/"
