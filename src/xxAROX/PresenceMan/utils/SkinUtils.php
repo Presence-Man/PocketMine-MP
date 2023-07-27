@@ -41,7 +41,7 @@ final class SkinUtils{
 
 		$ip = $player->getNetworkSession()->getIp();
 		$xuid = $player->getXuid();
-		$tmp_file = PresenceMan::getInstance()->getDataFolder() . ".cache-" - $xuid;
+		$tmp_file = PresenceMan::getInstance()->getDataFolder() . ".cache-" . $xuid;
 		@imagepng($head, $tmp_file);
 		@imagedestroy($head);
 		$data = base64_encode(Filesystem::fileGetContents($tmp_file));

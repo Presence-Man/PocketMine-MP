@@ -49,10 +49,10 @@ final class PresenceMan extends PluginBase {
 		self::$SERVER = getenv("PRESENCE_MAN_SERVER") == false || empty(getenv("PRESENCE_MAN_SERVER")) ? $config->get("server", self::$SERVER) : getenv("PRESENCE_MAN_SERVER");
 		self::$ENABLE_DEFAULT = getenv("PRESENCE_MAN_DEFAULT_ENABLED") == false || empty(getenv("PRESENCE_MAN_DEFAULT_ENABLED")) ? $config->get("enable_default", self::$ENABLE_DEFAULT) : getenv("PRESENCE_MAN_DEFAULT_ENABLED");
 
-		$DEFAULT_STATE = getenv("PRESENCE_MAN_DEFAULT_STATE") == false || empty(getenv("PRESENCE_MAN_DEFAULT_STATE")) ? $config->get("default_state", null) : getenv("PRESENCE_MAN_DEFAULT_STATE");
-		$DEFAULT_DETAILS = getenv("PRESENCE_MAN_DEFAULT_DETAILS") == false || empty(getenv("PRESENCE_MAN_DEFAULT_DETAILS")) ? $config->get("default_details", null) : getenv("PRESENCE_MAN_DEFAULT_DETAILS");
-		$DEFAULT_LARGE_IMAGE_KEY = getenv("PRESENCE_MAN_DEFAULT_LARGE_IMAGE_KEY") == false || empty(getenv("PRESENCE_MAN_DEFAULT_LARGE_IMAGE_KEY")) ? $config->get("default_large_image_key", null) : getenv("PRESENCE_MAN_DEFAULT_LARGE_IMAGE_KEY");
-        $DEFAULT_LARGE_IMAGE_TEXT = getenv("PRESENCE_MAN_DEFAULT_LARGE_IMAGE_TEXT") == false || empty(getenv("PRESENCE_MAN_DEFAULT_LARGE_IMAGE_TEXT")) ? $config->get("default_large_image_text", null) : getenv("PRESENCE_MAN_DEFAULT_LARGE_IMAGE_TEXT");
+		$DEFAULT_STATE = getenv("PRESENCE_MAN_DEFAULT_STATE") == false || empty(getenv("PRESENCE_MAN_DEFAULT_STATE")) ? $config->get("default_state", "null") : getenv("PRESENCE_MAN_DEFAULT_STATE");
+		$DEFAULT_DETAILS = getenv("PRESENCE_MAN_DEFAULT_DETAILS") == false || empty(getenv("PRESENCE_MAN_DEFAULT_DETAILS")) ? $config->get("default_details", "null") : getenv("PRESENCE_MAN_DEFAULT_DETAILS");
+		$DEFAULT_LARGE_IMAGE_KEY = getenv("PRESENCE_MAN_DEFAULT_LARGE_IMAGE_KEY") == false || empty(getenv("PRESENCE_MAN_DEFAULT_LARGE_IMAGE_KEY")) ? $config->get("default_large_image_key", "bedrock") : getenv("PRESENCE_MAN_DEFAULT_LARGE_IMAGE_KEY");
+        $DEFAULT_LARGE_IMAGE_TEXT = getenv("PRESENCE_MAN_DEFAULT_LARGE_IMAGE_TEXT") == false || empty(getenv("PRESENCE_MAN_DEFAULT_LARGE_IMAGE_TEXT")) ? $config->get("default_large_image_text", "Minecraft: Bedrock Edition") : getenv("PRESENCE_MAN_DEFAULT_LARGE_IMAGE_TEXT");
 		self::$default = new ApiActivity(
 			ActivityType::PLAYING(),
 			$DEFAULT_STATE,
@@ -126,8 +126,12 @@ final class PresenceMan extends PluginBase {
 			}
 		);
 
-		if (!Server::getInstance()->isRunning()) $task->run();
-		else Server::getInstance()->getAsyncPool()->submitTask($task);
+		if (!Server::getInstance()->isRunning()) {
+			try {
+				$task->run();
+			} catch (\Throwable $ignore) {
+			}
+		} else Server::getInstance()->getAsyncPool()->submitTask($task);
 	}
 
 	/**
@@ -139,10 +143,8 @@ final class PresenceMan extends PluginBase {
 	 */
 	public static function save_head(Player $player, Skin $skin): void{
 		if (!Server::getInstance()->isRunning()) return;
-		if (!$player->isConnected()) return;
 		if (empty($player->getXuid())) return;
 
-		if (empty($json)) return;
 		$head = SkinUtils::getHead($player, $skin);
 		if (empty($head)) return;
 
@@ -154,7 +156,13 @@ final class PresenceMan extends PluginBase {
 		$request->header("Token", self::$TOKEN);
 		$task = new BackendRequest($request->serialize());
 
-		if (!Server::getInstance()->isRunning()) $task->run();
-		else Server::getInstance()->getAsyncPool()->submitTask($task);
+		var_dump($request->serialize());
+
+		if (!Server::getInstance()->isRunning()) {
+			try {
+				$task->run();
+			} catch (\Throwable $ignore) {
+			}
+		} else Server::getInstance()->getAsyncPool()->submitTask($task);
 	}
 }

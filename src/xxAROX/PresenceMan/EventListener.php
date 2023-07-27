@@ -6,8 +6,6 @@ use pocketmine\event\player\PlayerChangeSkinEvent;
 use pocketmine\event\player\PlayerJoinEvent;
 use pocketmine\event\player\PlayerLoginEvent;
 use pocketmine\event\player\PlayerQuitEvent;
-use pocketmine\scheduler\CancelTaskException;
-use pocketmine\scheduler\ClosureTask;
 use xxAROX\PresenceMan\entity\ApiActivity;
 
 
@@ -38,13 +36,7 @@ class EventListener implements Listener{
 	 * @priority MONITOR
 	 */
 	public function PlayerJoinEvent(PlayerJoinEvent $event): void{
-		$task = function () use($event): void{
-			if ($event->getPlayer()->getSkin() != null) {
-				PresenceMan::save_head($event->getPlayer(), $event->getPlayer()->getSkin());
-				throw new CancelTaskException();
-			}
-		};
-		PresenceMan::getInstance()->getScheduler()->scheduleRepeatingTask(new ClosureTask($task), 10); // BLAME: @somebody  |  Skin is not loaded yet, idk why..
+		PresenceMan::save_head($event->getPlayer(), $event->getPlayer()->getSkin());
 	}
 
 	/**
