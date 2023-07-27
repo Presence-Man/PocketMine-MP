@@ -8,6 +8,7 @@ use pocketmine\utils\SingletonTrait;
 use xxAROX\PresenceMan\entity\ActivityType;
 use xxAROX\PresenceMan\entity\ApiActivity;
 use xxAROX\PresenceMan\entity\ApiRequest;
+use xxAROX\PresenceMan\entity\Gateway;
 use xxAROX\PresenceMan\task\async\BackendRequest;
 use xxAROX\PresenceMan\task\async\FetchGatewayInformationTask;
 use xxAROX\PresenceMan\utils\SkinUtils;
@@ -39,7 +40,7 @@ final class PresenceMan extends PluginBase {
 	public static array $presences = [];
 	public static ApiActivity $default;
 
-	public function onLoad(): void{
+	protected function onLoad(): void{
 		self::setInstance($this);
         $this->saveResource("config.yml");
         $config = $this->getConfig();
@@ -61,12 +62,21 @@ final class PresenceMan extends PluginBase {
 			$DEFAULT_LARGE_IMAGE_TEXT
 		);
     }
-
     protected function onEnable(): void{
 		$this->getServer()->getPluginManager()->registerEvents(new EventListener(), $this);
 		$this->getServer()->getAsyncPool()->submitTask(new FetchGatewayInformationTask());
     }
+	protected function onDisable(): void{
+		foreach ($this->getServer()->getOnlinePlayers() as $onlinePlayer) self::offline($onlinePlayer);
+		parent::onDisable();
+	}
 
+	/**
+	 * Function setActivity
+	 * @param Player $player
+	 * @param null|ApiActivity $activity
+	 * @return void
+	 */
 	public static function setActivity(Player $player, ?ApiActivity $activity = null): void{
 		if (!Server::getInstance()->isRunning()) return;
 		if (!$player->isConnected()) return;
@@ -86,6 +96,15 @@ final class PresenceMan extends PluginBase {
 				else PresenceMan::getInstance()->getLogger()->error("Failed to update presence for " . $player->getName() . ": " . $response["message"] ?? "n/a");
 			}
 		));
+	}
+
+	/**
+	 * Function getHeadUrl
+	 * @param string $xuid
+	 * @return string
+	 */
+	public static function getHeadUrl(string $xuid): string{
+		return Gateway::getUrl() . "/api/v1/heads/$xuid";
 	}
 
 	/**
