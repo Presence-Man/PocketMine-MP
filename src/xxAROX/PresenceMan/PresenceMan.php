@@ -1,5 +1,6 @@
 <?php
 namespace xxAROX\PresenceMan;
+use pocketmine\entity\Skin;
 use pocketmine\player\Player;
 use pocketmine\plugin\PluginBase;
 use pocketmine\Server;
@@ -9,6 +10,7 @@ use xxAROX\PresenceMan\entity\ApiActivity;
 use xxAROX\PresenceMan\entity\ApiRequest;
 use xxAROX\PresenceMan\task\async\BackendRequest;
 use xxAROX\PresenceMan\task\async\FetchGatewayInformationTask;
+use xxAROX\PresenceMan\utils\SkinUtils;
 
 
 /**
@@ -29,7 +31,11 @@ final class PresenceMan extends PluginBase {
     public static string $SERVER = "undefined";
 	public static bool $ENABLE_DEFAULT = false;
 
-	/** @var ApiActivity[] */
+	/**
+	 * @var ApiActivity[]
+	 * @readonly
+	 * @final
+	 */
 	public static array $presences = [];
 	public static ApiActivity $default;
 
@@ -46,17 +52,13 @@ final class PresenceMan extends PluginBase {
 		$DEFAULT_DETAILS = getenv("PRESENCE_MAN_DEFAULT_DETAILS") == false || empty(getenv("PRESENCE_MAN_DEFAULT_DETAILS")) ? $config->get("default_details", null) : getenv("PRESENCE_MAN_DEFAULT_DETAILS");
 		$DEFAULT_LARGE_IMAGE_KEY = getenv("PRESENCE_MAN_DEFAULT_LARGE_IMAGE_KEY") == false || empty(getenv("PRESENCE_MAN_DEFAULT_LARGE_IMAGE_KEY")) ? $config->get("default_large_image_key", null) : getenv("PRESENCE_MAN_DEFAULT_LARGE_IMAGE_KEY");
         $DEFAULT_LARGE_IMAGE_TEXT = getenv("PRESENCE_MAN_DEFAULT_LARGE_IMAGE_TEXT") == false || empty(getenv("PRESENCE_MAN_DEFAULT_LARGE_IMAGE_TEXT")) ? $config->get("default_large_image_text", null) : getenv("PRESENCE_MAN_DEFAULT_LARGE_IMAGE_TEXT");
-        $DEFAULT_SMALL_IMAGE_KEY = getenv("PRESENCE_MAN_DEFAULT_SMALL_IMAGE_KEY") == false || empty(getenv("PRESENCE_MAN_DEFAULT_SMALL_IMAGE_KEY")) ? $config->get("default_small_image_key", null) : getenv("PRESENCE_MAN_DEFAULT_SMALL_IMAGE_KEY");
-        $DEFAULT_SMALL_IMAGE_TEXT = getenv("PRESENCE_MAN_DEFAULT_SMALL_IMAGE_TEXT") == false || empty(getenv("PRESENCE_MAN_DEFAULT_SMALL_IMAGE_TEXT")) ? $config->get("default_small_image_text", null) : getenv("PRESENCE_MAN_DEFAULT_SMALL_IMAGE_TEXT");
 		self::$default = new ApiActivity(
 			ActivityType::PLAYING(),
 			$DEFAULT_STATE,
 			$DEFAULT_DETAILS,
 			null,
 			$DEFAULT_LARGE_IMAGE_KEY,
-			$DEFAULT_LARGE_IMAGE_TEXT,
-			$DEFAULT_SMALL_IMAGE_KEY,
-			$DEFAULT_SMALL_IMAGE_TEXT
+			$DEFAULT_LARGE_IMAGE_TEXT
 		);
     }
 
@@ -66,6 +68,10 @@ final class PresenceMan extends PluginBase {
     }
 
 	public static function setActivity(Player $player, ?ApiActivity $activity = null): void{
+		if (!Server::getInstance()->isRunning()) return;
+		if (!$player->isConnected()) return;
+		if (empty($player->getXuid())) return;
+
 		$request = new ApiRequest(ApiRequest::$URI_UPDATE_PRESENCE, [
 			"ip" => $player->getNetworkSession()->getIp(),
 			"xuid" => $player->getXuid(),
@@ -96,8 +102,39 @@ final class PresenceMan extends PluginBase {
 		$request->header("Token", self::$TOKEN);
 		$task = new BackendRequest(
 			$request->serialize(),
-			function (array $response) use ($player): void{unset(self::$presences[$player->getXuid()]);}
+			function (array $response) use ($player): void{
+				unset(self::$presences[$player->getXuid()]);
+			}
 		);
+
+		if (!Server::getInstance()->isRunning()) $task->run();
+		else Server::getInstance()->getAsyncPool()->submitTask($task);
+	}
+
+	/**
+	 * Function save_head
+	 * @param Player $player
+	 * @param Skin $skin
+	 * @return void
+	 * @internal
+	 */
+	public static function save_head(Player $player, Skin $skin): void{
+		if (!Server::getInstance()->isRunning()) return;
+		if (!$player->isConnected()) return;
+		if (empty($player->getXuid())) return;
+
+		if (empty($json)) return;
+		$head = SkinUtils::getHead($player, $skin);
+		if (empty($head)) return;
+
+		$request = new ApiRequest(ApiRequest::$URI_UPDATE_HEAD, [
+			"ip" => $player->getNetworkSession()->getIp(),
+			"xuid" => $player->getXuid(),
+			"head" => $head,
+		], true);
+		$request->header("Token", self::$TOKEN);
+		$task = new BackendRequest($request->serialize());
+
 		if (!Server::getInstance()->isRunning()) $task->run();
 		else Server::getInstance()->getAsyncPool()->submitTask($task);
 	}

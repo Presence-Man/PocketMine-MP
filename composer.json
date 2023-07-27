@@ -15,6 +15,9 @@
         "build": "@php -dphar.readonly=0 build.php"
     },
     "require-dev": {
-        "pocketmine/pocketmine-mp": "^5"
+        "pocketmine/pocketmine-mp": "^5.3.3"
+    },
+    "require": {
+        "ext-gd": "*"
     }
 }
