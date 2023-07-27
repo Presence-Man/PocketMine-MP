@@ -86,7 +86,7 @@ final class PresenceMan extends PluginBase {
 			"ip" => $player->getNetworkSession()->getIp(),
 			"xuid" => $player->getXuid(),
 			"server" => PresenceMan::$SERVER,
-			"api_activity" => $activity?->serialize(),
+			"api_activity" => $activity?->json_serialize(),
 		], true);
 		$request->header("Token", self::$TOKEN);
 		Server::getInstance()->getAsyncPool()->submitTask(new BackendRequest(

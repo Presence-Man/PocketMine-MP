@@ -1,6 +1,8 @@
 <?php
 declare(strict_types=1);
 namespace xxAROX\PresenceMan\entity;
+use JetBrains\PhpStorm\ArrayShape;
+use JetBrains\PhpStorm\Pure;
 use xxAROX\PresenceMan\PresenceMan;
 
 
@@ -37,7 +39,22 @@ final class ApiActivity{
 	}
 
 	public function serialize(): string{
-		$json = [
+		return json_encode($this->json_serialize());
+	}
+
+	#[Pure]
+	#[ArrayShape([
+		'type'                   => "string",
+		'client_id'              => "null|string",
+		'state'                  => "null|string",
+		'details'                => "null|string",
+		'end'                    => "null|int",
+		'large_icon_key'         => "null|string",
+		'large_icon_text'        => "null|string",
+		'party_max_player_count' => "null|int",
+		'party_player_count'     => "null|int",
+	])] public function json_serialize(): array{
+		return [
 			'client_id' => PresenceMan::$CLIENT_ID,
 			'type' => $this->type->name(),
 			'state' => $this->state,
@@ -48,7 +65,6 @@ final class ApiActivity{
 			'party_max_player_count' => $this->party_max_player_count,
 			'party_player_count' => $this->party_player_count,
 		];
-		return json_encode($json);
 	}
 
 	public static function deserialize(array $json): APIActivity{
