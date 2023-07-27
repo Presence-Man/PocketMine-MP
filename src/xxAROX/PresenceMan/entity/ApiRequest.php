@@ -19,6 +19,8 @@ final class ApiRequest{
 	/** @internal */
 	static string $URI_UPDATE_PRESENCE = "/api/v1/servers/update_presence";
 	/** @internal */
+	static string $URI_UPDATE_HEAD = "/api/v1/heads/update";
+	/** @internal */
 	static string $URI_OFFLINE = "/api/v1/servers/offline";
 
 	/**

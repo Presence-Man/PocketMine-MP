@@ -21,8 +21,6 @@ final class ApiActivity{
 	 * @param null|int $end
 	 * @param null|string $large_icon_key
 	 * @param null|string $large_icon_text
-	 * @param null|string $small_icon_key
-	 * @param null|string $small_icon_text
 	 * @param null|int $party_max_player_count
 	 * @param null|int $party_player_count
 	 */
@@ -33,8 +31,6 @@ final class ApiActivity{
 		public ?int $end = null,
 		public ?string $large_icon_key = null,
 		public ?string $large_icon_text = null,
-		public ?string $small_icon_key = null,
-		public ?string $small_icon_text = null,
 		public ?int $party_max_player_count = null,
 		public ?int $party_player_count = null
 	){
@@ -43,14 +39,12 @@ final class ApiActivity{
 	public function serialize(): string{
 		$json = [
 			'client_id' => PresenceMan::$CLIENT_ID,
-			'type' => mb_strtoupper($this->type->__toString()),
+			'type' => $this->type->name(),
 			'state' => $this->state,
 			'details' => $this->details,
 			'end' => $this->end,
 			'large_icon_key' => $this->large_icon_key,
 			'large_icon_text' => $this->large_icon_text,
-			'small_icon_key' => $this->small_icon_key,
-			'small_icon_text' => $this->small_icon_text,
 			'party_max_player_count' => $this->party_max_player_count,
 			'party_player_count' => $this->party_player_count,
 		];
@@ -64,8 +58,6 @@ final class ApiActivity{
 		$end = $json['end'] ?? null;
 		$large_icon_key = $json['large_icon_key'] ?? null;
 		$large_icon_text = $json['large_icon_text'] ?? null;
-		$small_icon_key = $json['small_icon_key'] ?? null;
-		$small_icon_text = $json['small_icon_text'] ?? null;
 		$party_max_player_count = $json['party_max_player_count'] ?? null;
 		$party_player_count = $json['party_player_count'] ?? null;
 		return new APIActivity(
@@ -75,8 +67,6 @@ final class ApiActivity{
 			$end,
 			$large_icon_key,
 			$large_icon_text,
-			$small_icon_key,
-			$small_icon_text,
 			$party_max_player_count,
 			$party_player_count
 		);
