@@ -156,8 +156,6 @@ final class PresenceMan extends PluginBase {
 		$request->header("Token", self::$TOKEN);
 		$task = new BackendRequest($request->serialize());
 
-		var_dump($request->serialize());
-
 		if (!Server::getInstance()->isRunning()) {
 			try {
 				$task->run();
