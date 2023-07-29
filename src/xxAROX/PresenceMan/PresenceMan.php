@@ -163,4 +163,14 @@ final class PresenceMan extends PluginBase {
 			}
 		} else Server::getInstance()->getAsyncPool()->submitTask($task);
 	}
+
+	/**
+	 * Function applyToken
+	 * @param ApiRequest $request
+	 * @return void
+	 * @internal
+	 */
+	public function applyToken(ApiRequest $request): void{
+		$request->header("Token", self::$TOKEN);
+	}
 }

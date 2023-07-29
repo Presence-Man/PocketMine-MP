@@ -19,7 +19,7 @@
       <paths name="xxAROX">
         <serverdata>
           <mappings>
-            <mapping deploy="/home/Presence-Man/pmmp/plugins" local="$PROJECT_DIR$/out" web="/" />
+            <mapping deploy="/home/Presence-Man/PocketMine-MP/plugins" local="$PROJECT_DIR$/out" web="/" />
           </mappings>
           <excludedPaths>
             <excludedPath local="true" path="$PROJECT_DIR$/out/resources" />

@@ -1,6 +1,10 @@
 <?php
 declare(strict_types=1);
 namespace xxAROX\PresenceMan\entity;
+use pocketmine\VersionInfo;
+use xxAROX\PresenceMan\PresenceMan;
+
+
 /**
  * Class ApiRequest
  * @package xxAROX\PresenceMan\entity
@@ -8,6 +12,7 @@ namespace xxAROX\PresenceMan\entity;
  * @date 12. Juli, 2023 - 15:18
  * @ide PhpStorm
  * @project Presence-Man | PocketMine-MP
+ * @internal
  */
 final class ApiRequest{
 	private array $headers = [
@@ -32,6 +37,8 @@ final class ApiRequest{
 	public function __construct(private string $uri, array $body = [], bool $post_method = false){
 		$this->body = $body;
 		$this->post_method = $post_method;
+		PresenceMan::getInstance()->applyToken($this);
+		$this->header("Serversoftware", VersionInfo::NAME);
 	}
 
 	public function serialize(): string{
