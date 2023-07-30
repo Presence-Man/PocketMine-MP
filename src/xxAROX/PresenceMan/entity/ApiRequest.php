@@ -2,7 +2,6 @@
 declare(strict_types=1);
 namespace xxAROX\PresenceMan\entity;
 use pocketmine\VersionInfo;
-use xxAROX\PresenceMan\PresenceMan;
 
 
 /**
@@ -37,7 +36,6 @@ final class ApiRequest{
 	public function __construct(private string $uri, array $body = [], bool $post_method = false){
 		$this->body = $body;
 		$this->post_method = $post_method;
-		PresenceMan::getInstance()->applyToken($this);
 		$this->header("Serversoftware", VersionInfo::NAME);
 	}
 
