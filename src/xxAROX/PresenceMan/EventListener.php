@@ -26,17 +26,8 @@ class EventListener implements Listener{
 	 */
 	public function PlayerLoginEvent(PlayerLoginEvent $event): void{
 		if (!PresenceMan::$ENABLE_DEFAULT) return;
-		PresenceMan::setActivity($event->getPlayer(), ApiActivity::default_activity());
-	}
-
-	/**
-	 * Function PlayerJoinEvent
-	 * @param PlayerJoinEvent $event
-	 * @return void
-	 * @priority MONITOR
-	 */
-	public function PlayerJoinEvent(PlayerJoinEvent $event): void{
 		if (!PresenceMan::$UPDATE_SKIN) PresenceMan::save_head($event->getPlayer(), $event->getPlayer()->getSkin());
+		PresenceMan::setActivity($event->getPlayer(), ApiActivity::default_activity());
 	}
 
 	/**
