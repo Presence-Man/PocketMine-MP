@@ -36,7 +36,7 @@ class EventListener implements Listener{
 	 * @priority MONITOR
 	 */
 	public function PlayerJoinEvent(PlayerJoinEvent $event): void{
-		PresenceMan::save_head($event->getPlayer(), $event->getPlayer()->getSkin());
+		if (!PresenceMan::$UPDATE_SKIN) PresenceMan::save_head($event->getPlayer(), $event->getPlayer()->getSkin());
 	}
 
 	/**

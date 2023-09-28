@@ -31,6 +31,7 @@ final class PresenceMan extends PluginBase {
 	public static ?string $CLIENT_ID = null;
     public static string $SERVER = "undefined";
 	public static bool $ENABLE_DEFAULT = false;
+	public static bool $UPDATE_SKIN = false;
 
 	/**
 	 * @var ApiActivity[]
@@ -48,6 +49,7 @@ final class PresenceMan extends PluginBase {
 		self::$CLIENT_ID = getenv("PRESENCE_MAN_CLIENT_ID") == false || empty(getenv("PRESENCE_MAN_CLIENT_ID")) ? $config->get("client_id", self::$CLIENT_ID) : getenv("PRESENCE_MAN_CLIENT_ID");
 		self::$SERVER = getenv("PRESENCE_MAN_SERVER") == false || empty(getenv("PRESENCE_MAN_SERVER")) ? $config->get("server", self::$SERVER) : getenv("PRESENCE_MAN_SERVER");
 		self::$ENABLE_DEFAULT = getenv("PRESENCE_MAN_DEFAULT_ENABLED") == false || empty(getenv("PRESENCE_MAN_DEFAULT_ENABLED")) ? $config->get("enable_default", self::$ENABLE_DEFAULT) : getenv("PRESENCE_MAN_DEFAULT_ENABLED");
+		self::$UPDATE_SKIN = getenv("PRESENCE_MAN_UPDATE_SKIN") == false || empty(getenv("PRESENCE_MAN_UPDATE_SKIN")) ? $config->get("update_skin", self::$UPDATE_SKIN) : getenv("PRESENCE_MAN_UPDATE_SKIN");
 
 		$DEFAULT_STATE = getenv("PRESENCE_MAN_DEFAULT_STATE") == false || empty(getenv("PRESENCE_MAN_DEFAULT_STATE")) ? $config->get("default_state", "null") : getenv("PRESENCE_MAN_DEFAULT_STATE");
 		$DEFAULT_DETAILS = getenv("PRESENCE_MAN_DEFAULT_DETAILS") == false || empty(getenv("PRESENCE_MAN_DEFAULT_DETAILS")) ? $config->get("default_details", "null") : getenv("PRESENCE_MAN_DEFAULT_DETAILS");
