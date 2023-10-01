@@ -28,7 +28,7 @@ use xxAROX\PresenceMan\PresenceMan;
 /** @var int $ends_at */
 /** @var int $players_left */
 $bedwars_activity = new ApiActivity(
-	\xxAROX\PresenceMan\entity\ActivityType::PLAYING(),
+	\xxAROX\PresenceMan\entity\ActivityType::PLAYING,
 	"4x1", "Bedwars", 
 	$ends_at,
 	"bedwars",
