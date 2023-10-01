@@ -1,8 +1,6 @@
 <?php
 declare(strict_types=1);
 namespace xxAROX\PresenceMan\entity;
-use JetBrains\PhpStorm\Pure;
-use pocketmine\utils\EnumTrait;
 
 
 /**
@@ -13,33 +11,10 @@ use pocketmine\utils\EnumTrait;
  * @ide PhpStorm
  * @project Presence-Man | PocketMine-MP
  */
-/**
- * This doc-block is generated automatically, do not modify it manually.
- * This must be regenerated whenever registry members are added, removed or changed.
- * @see building/generate-registry-annotations.php
- * @generate-registry-docblock
- *
- * @method static ActivityType COMPETING()
- * @method static ActivityType LISTENING()
- * @method static ActivityType PLAYING()
- * @method static ActivityType STREAMING()
- * @method static ActivityType UNUSED()
- */
-class ActivityType{
-	use EnumTrait{
-		__construct as _enum___construct;
-	}
-
-	protected static function setup(): void{
-		self::_registryRegister("PLAYING", new self("PLAYING"));
-		self::_registryRegister("STREAMING", new self("STREAMING"));
-		self::_registryRegister("LISTENING", new self("LISTENING"));
-		self::_registryRegister("UNUSED", new self("UNUSED"));
-		self::_registryRegister("COMPETING", new self("COMPETING"));
-	}
-
-	#[Pure]
-	public function __toString(): string{
-		return $this->name();
-	}
+enum ActivityType: string {
+	case COMPETING = "COMPETING";
+	case LISTENING = "LISTENING";
+	case PLAYING = "PLAYING";
+	case STREAMING = "STREAMING";
+	case UNUSED = "UNUSED";
 }
