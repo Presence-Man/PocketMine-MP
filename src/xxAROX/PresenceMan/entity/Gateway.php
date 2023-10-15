@@ -12,7 +12,7 @@ namespace xxAROX\PresenceMan\entity;
 final class Gateway{
 	public static string $protocol = "http://";
 	public static string $address = "127.0.0.1";
-	public static int $port = 1515;
+	public static ?int $port = null;
 	public static bool $broken = false;
 
 	public static function getUrl(): string{

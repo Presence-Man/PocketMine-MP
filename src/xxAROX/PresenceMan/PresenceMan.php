@@ -11,6 +11,7 @@ use xxAROX\PresenceMan\entity\ApiRequest;
 use xxAROX\PresenceMan\entity\Gateway;
 use xxAROX\PresenceMan\task\async\BackendRequest;
 use xxAROX\PresenceMan\task\async\FetchGatewayInformationTask;
+use xxAROX\PresenceMan\task\UpdateCheckerTask;
 use xxAROX\PresenceMan\utils\SkinUtils;
 use xxAROX\PresenceMan\utils\Utils;
 
@@ -70,11 +71,11 @@ final class PresenceMan extends PluginBase {
     }
     protected function onEnable(): void{
 		$this->getServer()->getPluginManager()->registerEvents(new EventListener(), $this);
+		$this->getScheduler()->scheduleRepeatingTask(new UpdateCheckerTask(), 20 *60 *60); // NOTE: 60 minutes
 		$this->getServer()->getAsyncPool()->submitTask(new FetchGatewayInformationTask());
     }
 	protected function onDisable(): void{
 		foreach ($this->getServer()->getOnlinePlayers() as $onlinePlayer) self::offline($onlinePlayer);
-		parent::onDisable();
 	}
 
 	/**

@@ -25,7 +25,9 @@ class FetchGatewayInformationTask extends AsyncTask{
 	private const URL = "https://raw.githubusercontent.com/Presence-Man/releases/main/gateway.json";
 
 	public function onRun(): void{
-		$response = Internet::getURL(self::URL);
+		$response = Internet::getURL(self::URL, 5, [
+			"Cache-Control: no-cache, no-store"
+		]);
 		try {
 			if ($response == null) {
 				PresenceMan::getInstance()->getLogger()->critical("Presence-Man backend-gateway config is not reachable, disabling..");
@@ -47,7 +49,7 @@ class FetchGatewayInformationTask extends AsyncTask{
 		}
 		Gateway::$protocol = ((string) $result["protocol"]) ?? Gateway::$protocol;
 		Gateway::$address = ((string) $result["address"]) ?? Gateway::$address;
-		Gateway::$port = ((int) $result["port"]) ?? Gateway::$port;
+		Gateway::$port = empty($result["port"]) ? null : (int) $result["port"];
 		self::ping_backend(function (bool $success): void{
 			if (!$success) PresenceMan::getInstance()->getLogger()->error("Error while connecting to backend-server!");
 		});
