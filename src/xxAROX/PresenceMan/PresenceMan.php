@@ -12,6 +12,7 @@ use xxAROX\PresenceMan\entity\Gateway;
 use xxAROX\PresenceMan\task\async\BackendRequest;
 use xxAROX\PresenceMan\task\async\FetchGatewayInformationTask;
 use xxAROX\PresenceMan\utils\SkinUtils;
+use xxAROX\PresenceMan\utils\Utils;
 
 
 /**
@@ -43,18 +44,21 @@ final class PresenceMan extends PluginBase {
 
 	protected function onLoad(): void{
 		self::setInstance($this);
+        $this->saveResource("README.md");
         $this->saveResource("config.yml");
-        $config = $this->getConfig();
-		self::$TOKEN = getenv("PRESENCE_MAN_TOKEN") == false || empty(getenv("PRESENCE_MAN_TOKEN")) ? $config->get("token", self::$TOKEN) : getenv("PRESENCE_MAN_TOKEN");
-		self::$CLIENT_ID = getenv("PRESENCE_MAN_CLIENT_ID") == false || empty(getenv("PRESENCE_MAN_CLIENT_ID")) ? $config->get("client_id", self::$CLIENT_ID) : getenv("PRESENCE_MAN_CLIENT_ID");
-		self::$SERVER = getenv("PRESENCE_MAN_SERVER") == false || empty(getenv("PRESENCE_MAN_SERVER")) ? $config->get("server", self::$SERVER) : getenv("PRESENCE_MAN_SERVER");
-		self::$ENABLE_DEFAULT = getenv("PRESENCE_MAN_DEFAULT_ENABLED") == false || empty(getenv("PRESENCE_MAN_DEFAULT_ENABLED")) ? $config->get("enable_default", self::$ENABLE_DEFAULT) : getenv("PRESENCE_MAN_DEFAULT_ENABLED");
-		self::$UPDATE_SKIN = getenv("PRESENCE_MAN_UPDATE_SKIN") == false || empty(getenv("PRESENCE_MAN_UPDATE_SKIN")) ? $config->get("update_skin", self::$UPDATE_SKIN) : getenv("PRESENCE_MAN_UPDATE_SKIN");
 
-		$DEFAULT_STATE = getenv("PRESENCE_MAN_DEFAULT_STATE") == false || empty(getenv("PRESENCE_MAN_DEFAULT_STATE")) ? $config->get("default_state", "null") : getenv("PRESENCE_MAN_DEFAULT_STATE");
-		$DEFAULT_DETAILS = getenv("PRESENCE_MAN_DEFAULT_DETAILS") == false || empty(getenv("PRESENCE_MAN_DEFAULT_DETAILS")) ? $config->get("default_details", "null") : getenv("PRESENCE_MAN_DEFAULT_DETAILS");
-		$DEFAULT_LARGE_IMAGE_KEY = getenv("PRESENCE_MAN_DEFAULT_LARGE_IMAGE_KEY") == false || empty(getenv("PRESENCE_MAN_DEFAULT_LARGE_IMAGE_KEY")) ? $config->get("default_large_image_key", "bedrock") : getenv("PRESENCE_MAN_DEFAULT_LARGE_IMAGE_KEY");
-        $DEFAULT_LARGE_IMAGE_TEXT = getenv("PRESENCE_MAN_DEFAULT_LARGE_IMAGE_TEXT") == false || empty(getenv("PRESENCE_MAN_DEFAULT_LARGE_IMAGE_TEXT")) ? $config->get("default_large_image_text", "Minecraft: Bedrock Edition") : getenv("PRESENCE_MAN_DEFAULT_LARGE_IMAGE_TEXT");
+        $config = $this->getConfig();
+		self::$TOKEN = (string) Utils::getconfigvalue($config, "token");
+		self::$CLIENT_ID = (string) Utils::getconfigvalue($config, "client_id", "", self::$CLIENT_ID);
+		self::$SERVER = (string) Utils::getconfigvalue($config, "server", "", self::$SERVER);
+		self::$UPDATE_SKIN = (string) Utils::getconfigvalue($config, "update_skin", "", self::$UPDATE_SKIN);
+
+		self::$ENABLE_DEFAULT = (boolean) Utils::getconfigvalue($config, "default_presence.enabled", "DEFAULT_ENABLED", self::$ENABLE_DEFAULT);
+		$DEFAULT_STATE = (string) Utils::getconfigvalue($config, "default_presence.state", "DEFAULT_STATE", "Playing {server} on {network}");
+		$DEFAULT_DETAILS = (string) Utils::getconfigvalue($config, "default_presence.details", "DEFAULT_DETAILS", "");
+		$DEFAULT_LARGE_IMAGE_KEY = (string) Utils::getconfigvalue($config, "default_presence.large_image_key", "DEFAULT_LARGE_IMAGE_KEY", "");
+		$DEFAULT_LARGE_IMAGE_TEXT = (string) Utils::getconfigvalue($config, "default_presence.large_image_text", "DEFAULT_LARGE_IMAGE_TEXT", "{App.name} - v{App.version}");
+
 		self::$default = new ApiActivity(
 			ActivityType::PLAYING,
 			$DEFAULT_STATE,

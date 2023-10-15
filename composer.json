@@ -1,24 +1,22 @@
 {
     "name": "presence-man/pocketmine-mp",
+    "authors": [
+        { "name": "Jan Sohn / xxAROX" }
+    ],
+    "scripts": {
+        "build": "@php -dphar.readonly=0 build.php"
+    },
     "autoload": {
         "psr-4": {
             "xxAROX\\PresenceMan\\": "src/xxAROX/PresenceMan/"
         }
-    },
-    "authors": [
-        {
-            "name": "xxAROX",
-            "email": "arox.email.0@gmail.com"
-        }
-    ],
-    "scripts": {
-        "build": "@php -dphar.readonly=0 build.php"
     },
     "require-dev": {
         "php": "^8.1",
         "pocketmine/pocketmine-mp": "^5.6.0"
     },
     "require": {
-        "ext-gd": "*"
+        "ext-gd": "*",
+        "ext-yaml": "*"
     }
 }
