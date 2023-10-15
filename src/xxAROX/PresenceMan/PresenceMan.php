@@ -56,7 +56,7 @@ final class PresenceMan extends PluginBase {
 		$DEFAULT_LARGE_IMAGE_KEY = getenv("PRESENCE_MAN_DEFAULT_LARGE_IMAGE_KEY") == false || empty(getenv("PRESENCE_MAN_DEFAULT_LARGE_IMAGE_KEY")) ? $config->get("default_large_image_key", "bedrock") : getenv("PRESENCE_MAN_DEFAULT_LARGE_IMAGE_KEY");
         $DEFAULT_LARGE_IMAGE_TEXT = getenv("PRESENCE_MAN_DEFAULT_LARGE_IMAGE_TEXT") == false || empty(getenv("PRESENCE_MAN_DEFAULT_LARGE_IMAGE_TEXT")) ? $config->get("default_large_image_text", "Minecraft: Bedrock Edition") : getenv("PRESENCE_MAN_DEFAULT_LARGE_IMAGE_TEXT");
 		self::$default = new ApiActivity(
-			ActivityType::PLAYING(),
+			ActivityType::PLAYING,
 			$DEFAULT_STATE,
 			$DEFAULT_DETAILS,
 			null,

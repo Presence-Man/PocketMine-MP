@@ -68,7 +68,7 @@ final class ApiActivity{
 	}
 
 	public static function deserialize(array $json): APIActivity{
-		$type = isset($json['type']) ? (ActivityType::getAll()[mb_strtoupper($json['type'])] ?? ActivityType::PLAYING()) : ActivityType::PLAYING();
+		$type = isset($json['type']) ? (ActivityType::tryFrom(mb_strtoupper($json['type'])) ?? ActivityType::PLAYING) : ActivityType::PLAYING;
 		$state = $json['state'] ?? null;
 		$details = $json['details'] ?? null;
 		$end = $json['end'] ?? null;
