@@ -17,6 +17,6 @@ final class Gateway{
 
 	public static function getUrl(): string{
 		if (self::$broken) throw new \LogicException("Presence-Man Backend server is not reachable");
-		return self::$protocol . self::$address . ":" . self::$port;
+		return self::$protocol . self::$address . (!empty(self::$port) ? ":" . self::$port : "";
 	}
 }
