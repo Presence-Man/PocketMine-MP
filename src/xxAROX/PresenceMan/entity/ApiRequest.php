@@ -51,7 +51,7 @@ final class ApiRequest{
 
 	public static function deserialize(string $str): self{
 		$json = json_decode($str, true);
-		$self = new self($json["uri"], ($json["body"] ?? []), (bool) $json["post_method"], );
+		$self = new self($json["uri"], ($json["body"] ?? []), (bool) $json["post_method"]);
 		$self->headers = $json["headers"] ?? [];
 		return $self;
 	}
