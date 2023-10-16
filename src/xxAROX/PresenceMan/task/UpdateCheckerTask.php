@@ -17,9 +17,6 @@ use xxAROX\PresenceMan\task\async\PerformUpdateTask;
 class UpdateCheckerTask extends Task{
 	public static bool $running = false;
 
-	public function __construct(){
-	}
-
 	public function onRun(): void{
 		if (self::$running) return;
 		self::$running = true;
