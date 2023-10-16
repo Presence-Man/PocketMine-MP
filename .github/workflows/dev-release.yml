@@ -39,8 +39,7 @@ jobs:
 
       - name: "Rename PHAR"
         run: |
-          cp ${{ steps.metadata.outputs.NAME }}.phar Presence-Man-PocketMine-MP-v${{ steps.metadata.outputs.VERSION }}-dev.phar
-          cp ${{ steps.metadata.outputs.NAME }}.phar Presence-Man-PocketMine-MP-dev.phar
+          cp ${{ steps.metadata.outputs.NAME }}.phar Presence-Man-PocketMine-MP.phar
 
       - name: "Create Release"
         uses: "marvinpinto/action-automatic-releases@latest"
@@ -49,14 +48,4 @@ jobs:
           automatic_release_tag: "dev"
           prerelease: true
           title: "Development release v${{ steps.metadata.outputs.VERSION }}"
-          files: |
-            *.phar
-
-      - name: "Release to public"
-        uses: softprops/action-gh-release@v1
-        with:
-          tag_name: "latest"
-          name: "Latest releases"
-          repository: "Presence-Man/releases"
-          token: ${{ secrets.CUSTOM_GITHUB_TOKEN }}
-          files: "Presence-Man-PocketMine-MP-dev.phar"
+          files: "Presence-Man-PocketMine-MP.phar"
