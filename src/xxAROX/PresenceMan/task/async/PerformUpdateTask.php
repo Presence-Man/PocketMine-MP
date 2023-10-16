@@ -48,8 +48,8 @@ class PerformUpdateTask extends AsyncTask{
 			if (!$this->notified) {
 				PresenceMan::getInstance()->getLogger()->warning("Your version of Presence-Man is out of date. To avoid issues please update it to the latest version!");
 				PresenceMan::getInstance()->getLogger()->warning("Download: https://presence-man.com/downloads/pocketmine-mp");
+				$this->notified = true;
 			}
-			$this->notified = true;
 		}
 		UpdateCheckerTask::$running = false;
 	}
