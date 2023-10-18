@@ -56,7 +56,7 @@ final class ApiActivity{
 	])] public function json_serialize(): array{
 		return [
 			'client_id' => PresenceMan::$CLIENT_ID,
-			'type' => $this->type->name(),
+			'type' => $this->type->value,
 			'state' => $this->state,
 			'details' => $this->details,
 			'end' => $this->end,
