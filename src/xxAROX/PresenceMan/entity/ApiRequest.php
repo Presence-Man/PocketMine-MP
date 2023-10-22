@@ -22,8 +22,10 @@ final class ApiRequest{
 
 	/** @internal */
 	static string $URI_UPDATE_PRESENCE = "/api/v1/servers/update_presence";
+	/** @deprecated */
+	static string $URI_UPDATE_HEAD = "/api/v1/images/skin/update";
 	/** @internal */
-	static string $URI_UPDATE_HEAD = "/api/v1/heads/update";
+	static string $URI_UPDATE_SKIN = "/api/v1/images/skin/update";
 	/** @internal */
 	static string $URI_OFFLINE = "/api/v1/servers/offline";
 
@@ -36,7 +38,7 @@ final class ApiRequest{
 	public function __construct(private string $uri, array $body = [], bool $post_method = false){
 		$this->body = $body;
 		$this->post_method = $post_method;
-		$this->header("Serversoftware", VersionInfo::NAME);
+		$this->body("Serversoftware", VersionInfo::NAME);
 	}
 
 	public function serialize(): string{
