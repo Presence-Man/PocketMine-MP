@@ -3,3 +3,4 @@ composer.phar
 composer.lock
 /out
 /resources/plugin_data.yml
+Presence-Man.phar
