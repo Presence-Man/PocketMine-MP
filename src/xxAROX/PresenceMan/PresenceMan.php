@@ -129,7 +129,6 @@ final class PresenceMan extends PluginBase {
 		Server::getInstance()->getAsyncPool()->submitTask(new BackendRequest(
 			$request->serialize(),
 			function (array $response) use ($player, $activity): void{
-				var_dump($response);
 				if (isset($response["status"]) == 200) self::$presences[$player->getXuid()] = $activity;
 				else PresenceMan::getInstance()->getLogger()->error("Failed to update presence for " . $player->getName() . ": " . $response["message"] ?? "n/a");
 			}
@@ -143,7 +142,7 @@ final class PresenceMan extends PluginBase {
 	* @return void
 	* @internal
 	*/
-	private static function save_skin(Player $player, Skin $skin): void{
+	public static function save_skin(Player $player, Skin $skin): void{
 		if (Utils::isFromSameHost($player->getNetworkSession()->getIp())) return;
 		if (!Server::getInstance()->isRunning()) return;
 		if (empty($player->getXuid())) return;
@@ -173,7 +172,7 @@ final class PresenceMan extends PluginBase {
 	 * @return void
 	 * @internal
 	 */
-	private static function offline(Player $player): void{
+	public static function offline(Player $player): void{
 		if (Utils::isFromSameHost($player->getNetworkSession()->getIp())) return;
 		$request = new ApiRequest(ApiRequest::$URI_UPDATE_OFFLINE, [
 			"ip" => $player->getNetworkSession()->getIp(),

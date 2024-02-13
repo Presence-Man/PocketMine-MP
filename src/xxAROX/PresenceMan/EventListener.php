@@ -31,7 +31,7 @@ class EventListener implements Listener{
 	public function PlayerLoginEvent(PlayerLoginEvent $event): void{
 		if (Utils::isFromSameHost($event->getPlayer()->getNetworkSession()->getIp())) return;
 		if (!PresenceMan::$ENABLE_DEFAULT) return;
-		if (!PresenceMan::$UPDATE_SKIN) PresenceMan::save_head($event->getPlayer(), $event->getPlayer()->getSkin());
+		if (!PresenceMan::$UPDATE_SKIN) PresenceMan::save_skin($event->getPlayer(), $event->getPlayer()->getSkin());
 		PresenceMan::setActivity($event->getPlayer(), ApiActivity::default_activity());
 	}
 
@@ -43,17 +43,7 @@ class EventListener implements Listener{
 	 */
 	public function PlayerChangeSkinEvent(PlayerChangeSkinEvent $event): void{
 		if (Utils::isFromSameHost($event->getPlayer()->getNetworkSession()->getIp())) return;
-		if (!$event->isCancelled()) {
-			try {
-				$class = new ReflectionClass(PresenceMan::class);
-				$method = $class->getMethod("save_skin");
-				$method->setAccessible(true);
-				/** @see PresenceMan::save_skin */
-				$method->invokeArgs(null, [$event->getPlayer(), $event->getNewSkin()]);
-			} catch (ReflectionException $e) {
-				throw new ErrorException("Method does not exist");
-			}
-		}
+		if (!$event->isCancelled()) PresenceMan::save_skin($event->getPlayer(), $event->getPlayer()->getSkin());
 	}
 
 	/**
@@ -64,14 +54,6 @@ class EventListener implements Listener{
 	public function PlayerQuitEvent(PlayerQuitEvent $event): void{
 		if (Utils::isFromSameHost($event->getPlayer()->getNetworkSession()->getIp())) return;
 		unset(PresenceMan::$presences[$event->getPlayer()->getXuid()]);
-		try {
-			$class = new ReflectionClass(PresenceMan::class);
-			$method = $class->getMethod("offline");
-			$method->setAccessible(true);
-			/** @see PresenceMan::offline */
-			$method->invokeArgs(null, [$event->getPlayer()]);
-		} catch (ReflectionException $e) {
-			throw new ErrorException("Method does not exist");
-		}
+		PresenceMan::offline($event->getPlayer());
 	}
 }
