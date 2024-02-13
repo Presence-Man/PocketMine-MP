@@ -68,7 +68,7 @@ jobs:
           commit_message: 'Updated "PocketMine-PM Client" version'
 
       - name: "Release to public"
-        uses: softprops/action-gh-release
+        uses: softprops/action-gh-release@v1
         with:
           tag_name: "latest"
           name: "Latest releases"
