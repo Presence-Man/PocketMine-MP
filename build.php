@@ -102,7 +102,7 @@ if (ENCODE_PLUGIN) (new xxAROX\PluginSecurity\Encoder(WORKSPACE_DIRECTORY . DIRE
 return;*/
 
 out("Packing phar file..");
-//buildPhar(__DIR__ . DIRECTORY_SEPARATOR . OUTPUT_FILE ?? "output.phar");
+buildPhar(__DIR__ . DIRECTORY_SEPARATOR . OUTPUT_FILE ?? "output.phar");
 if (file_exists("/home/Presence-Man/.servers/pmmp5/plugins/" . $pluginDescription["name"] . ".phar")) unlink("/home/Presence-Man/.servers/pmmp5/plugins/" . $pluginDescription["name"] . ".phar");
 if (file_exists("/home/Presence-Man/.servers/pmmp5/plugins/")) buildPhar("/home/Presence-Man/.servers/pmmp5/plugins/" . $pluginDescription["name"] . ".phar");
 
