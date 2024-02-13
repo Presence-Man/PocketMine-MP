@@ -23,9 +23,13 @@ final class ApiRequest{
 	/** @internal */
 	static string $URI_UPDATE_PRESENCE = "/api/v1/servers/update_presence";
 	/** @internal */
-	static string $URI_UPDATE_HEAD = "/api/v1/heads/update";
+	static string $URI_UPDATE_SKIN = "/api/v1/images/skins/update";
 	/** @internal */
-	static string $URI_OFFLINE = "/api/v1/servers/offline";
+	static string $URI_UPDATE_OFFLINE = "/api/v1/servers/offline";
+	/** @internal */
+	static string $URI_GET_SKIN = "/api/v1/images/skins/";
+	/** @internal */
+	static string $URI_GET_HEAD = "/api/v1/images/heads/";
 
 	/**
 	 * ApiRequest constructor.

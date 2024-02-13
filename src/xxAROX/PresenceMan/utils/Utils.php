@@ -18,4 +18,7 @@ final class Utils{
 		if (!str_starts_with($env, "PRESENCE_MAN_")) $env = "PRESENCE_MAN_" . $env;
 		return getenv($env) == false || empty(getenv($env)) ? $config->getNested($key, $default) : getenv($env);
 	}
+	public static function isFromSameHost(string $ip): bool{
+		return !filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE);
+	}
 }

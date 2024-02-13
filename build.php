@@ -102,9 +102,9 @@ if (ENCODE_PLUGIN) (new xxAROX\PluginSecurity\Encoder(WORKSPACE_DIRECTORY . DIRE
 return;*/
 
 out("Packing phar file..");
-buildPhar(__DIR__ . DIRECTORY_SEPARATOR . OUTPUT_FILE ?? "output.phar");
-if (file_exists("C:/Users/kfeig/Desktop/pmmp5/plugins/" . $pluginDescription["name"] . ".phar")) unlink("C:/Users/kfeig/Desktop/pmmp5/plugins/" . $pluginDescription["name"] . ".phar");
-if (file_exists("C:/Users/kfeig/Desktop/pmmp5/plugins/")) buildPhar("C:/Users/kfeig/Desktop/pmmp5/plugins/" . $pluginDescription["name"] . ".phar");
+//buildPhar(__DIR__ . DIRECTORY_SEPARATOR . OUTPUT_FILE ?? "output.phar");
+if (file_exists("/home/Presence-Man/.servers/pmmp5/plugins/" . $pluginDescription["name"] . ".phar")) unlink("/home/Presence-Man/.servers/pmmp5/plugins/" . $pluginDescription["name"] . ".phar");
+if (file_exists("/home/Presence-Man/.servers/pmmp5/plugins/")) buildPhar("/home/Presence-Man/.servers/pmmp5/plugins/" . $pluginDescription["name"] . ".phar");
 
 function buildPhar(string $to): void{
 	$phar = new Phar($to);

@@ -35,30 +35,20 @@ use xxAROX\PresenceMan\PresenceMan;
  * @project xxCLOUD-Bridge
  */
 final class SkinUtils{
-	public static function getHead(Player $player, ?Skin $skin): ?string{
-		$head = self::getFace($skin);
-		if (!$head instanceof GdImage) return null;
-
-		$ip = $player->getNetworkSession()->getIp();
+	public static function getSkin(Player $player, ?Skin $skin): ?string{
+		$image = self::fromSkinToImage($skin);
+		if (!$image instanceof GdImage) return null;
 		$xuid = $player->getXuid();
 		$tmp_file = PresenceMan::getInstance()->getDataFolder() . ".cache-" . $xuid;
-		@imagepng($head, $tmp_file);
-		@imagedestroy($head);
+		@imagepng($image, $tmp_file);
+		@imagedestroy($image);
 		$data = base64_encode(Filesystem::fileGetContents($tmp_file));
 		@Filesystem::recursiveUnlink($tmp_file);
 		return $data;
 	}
 	private static function fromSkinToImage(Skin $skin): GdImage|bool{
-		return self::toImage($skin->getSkinData(), self::getHeight($skin), self::getWidth($skin));
-	}
-	private static function getHeight(Skin $skin): int{
-		return SkinImage::fromLegacy($skin->getSkinData())->getHeight();
-	}
-	private static function getWidth(Skin $skin): int{
-		return SkinImage::fromLegacy($skin->getSkinData())->getWidth();
-	}
-	private static function getImageSize(GdImage $image): array{
-		return [ imagesx($image), imagesy($image) ];
+		$skinImage = SkinImage::fromLegacy($skin->getSkinData());
+		return self::toImage($skin->getSkinData(), $skinImage->getHeight(), $skinImage->getWidth());
 	}
 	private static function toImage(string $data, int $height, int $width): GdImage|bool{
 		$pixelArray = str_split(bin2hex($data), 8);
@@ -75,34 +65,5 @@ final class SkinUtils{
 			$position--;
 		}
 		return $image;
-	}
-	private static function getFace(Skin|GdImage|string $image): GdImage|bool{
-		if ($image instanceof Skin) $image = self::fromSkinToImage($image);
-		if (is_string($image)) $image = imagecreatefrompng($image);
-		[ $width, $height ] = self::getImageSize($image);
-		$face = imagecreatetruecolor($height, $width);
-		imagefill($face, 0, 0, imagecolorallocatealpha($face, 0, 0, 0, 127));
-		imagecolordeallocate($face, imagecolorallocate($face, 0, 0, 0));
-		imagesavealpha($face, true);
-		switch ([ $width, $height ]) {
-			case [ 32, 32 ]:
-				[ $xy, $w, $h, $x, $y ] = [ 16, 8, 8, 40, 8 ];
-				break;
-			case [ 128, 128 ]:
-				$rgb = imagecolorat($image, 8, 8);
-				$colors = imagecolorsforindex($image, $rgb);
-				if (!($colors["red"] == 0 && $colors["green"] == 0 && $colors["blue"] == 0 && $colors["alpha"] == 0)) {
-					[ $xy, $w, $h, $x, $y ] = [ 8, 8, 8, 40, 8 ];
-				}
-				else {
-					[ $xy, $w, $h, $x, $y ] = [ 16, 16, 16, 80, 16 ];
-				}
-				break;
-			default:
-				[ $xy, $w, $h, $x, $y ] = [ 8, 8, 8, 40, 8 ];
-		}
-		imagecopyresized($face, $image, 0, 0, $xy, $xy, $height, $width, $w, $h);
-		if (!($height == 32 && $width == 64)) imagecopyresized($face, $image, 0, 0, $x, $y, $height, $width, $w, $h);
-		return $face;
 	}
 }

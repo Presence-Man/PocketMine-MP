@@ -71,7 +71,7 @@ class BackendRequest extends AsyncTask{
 				PresenceMan::getInstance()->getLogger()->error("[CLIENT-ERROR] [" .$request->getUri() . "]: " . $result->getBody());
 				if ($this->onError != null) ($this->onError)($result);
 			} else if (in_array($result->getCode(), range(500, 599))) { // Server-Errors
-				PresenceMan::getInstance()->getLogger()->error("[API-ERROR] [" .$request->getUri() . "]: " . $result->getBody());
+				if (!str_contains($result->getBody(), "<html>")) PresenceMan::getInstance()->getLogger()->error("[API-ERROR] [" .$request->getUri() . "]: " . $result->getBody());
 				if ($this->onError != null) ($this->onError)($result);
 			}
 		} else PresenceMan::getInstance()->getLogger()->error("[JUST-IN-CASE-ERROR] [" . $request->getUri() . "]: got null, that's not good");
