@@ -2,7 +2,6 @@ name: "Stable release"
 on:
   push:
     branches: [ "main" ]
-    files: [ "src/**" ]
 
 jobs:
   release:
@@ -31,6 +30,7 @@ jobs:
       - name: "Get data"
         id: metadata
         run: |
+          echo "NEW_VERSION=$(php -r 'echo version_compare(yaml_parse_file(getcwd() . DIRECTORY_SEPARATOR . "plugin.yml")["version"]), file_get_contents(__DIR__ + "/version-pocketmine-mp.txt"), ">=");')" >> $GITHUB_OUTPUT
           echo "VERSION=$(php -r 'echo explode("+", explode("-", yaml_parse_file(getcwd() . DIRECTORY_SEPARATOR . "plugin.yml")["version"])[0])[0];')" >> $GITHUB_OUTPUT
           echo "FULL_VERSION=$(php -r 'echo yaml_parse_file(getcwd() . DIRECTORY_SEPARATOR .                                "plugin.yml")["version"];')" >> $GITHUB_OUTPUT
           echo "NAME=$(php -r 'echo yaml_parse_file(getcwd() . DIRECTORY_SEPARATOR .                                                 "plugin.yml")["name"];')" >> $GITHUB_OUTPUT
@@ -50,28 +50,14 @@ jobs:
           automatic_release_tag: "v${{ steps.metadata.outputs.VERSION }}"
           prerelease: false
           title: "Stable release v${{ steps.metadata.outputs.VERSION }}"
-          files: "*.phar"
+          files: "Presence-Man-PocketMine-MP.phar"
 
-      #- name: "Create version-pocketmine-mp.txt"
-      #  run: "echo \"${{ steps.metadata.outputs.VERSION }}\" >> version-pocketmine-mp.txt"
+      - name: "Create latest_version.txt"
+        run: "echo \"${{ steps.metadata.outputs.VERSION }}\" > latest_version.txt"
 
-      #- name: "Pushes latest version-pocketmine-mp.txt file"
-      #  uses: dmnemec/copy_file_to_another_repo_action@main
-      #  env:
-      #    API_TOKEN_GITHUB: ${{ secrets.CUSTOM_GITHUB_TOKEN }}
-      #  with:
-      #    source_file: 'version-pocketmine-mp.txt'
-      #    destination_repo: 'Presence-Man/releases'
-      #    destination_folder: ''
-      #    user_email: 'arox.email.0@gmail.com'
-      #    user_name: 'xxAROX'
-      #    commit_message: 'Updated "PocketMine-PM Client" version'
-
-      #- name: "Release to public"
-      #  uses: softprops/action-gh-release@v1
-      #  with:
-      #    tag_name: "latest"
-      #    name: "Latest releases"
-      #    repository: "Presence-Man/releases"
-      #    token: ${{ secrets.CUSTOM_GITHUB_TOKEN }}
-      #    files: "Presence-Man-PocketMine-MP.phar"
+      - name: "Update version.txt"
+        uses: "test-room-7/action-update-file@v1"
+        with:
+          file-path: latest_version.txt
+          commit-msg: "Updated latest version to ${{ steps.metadata.outputs.VERSION }} - ci ignore"
+          github-token: ${{ secrets.GITHUB_TOKEN }}

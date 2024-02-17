@@ -1,6 +1,7 @@
 <?php
 declare(strict_types=1);
 namespace xxAROX\PresenceMan\entity;
+use xxAROX\PresenceMan\task\async\FetchGatewayInformationTask;
 /**
  * Class Gateway
  * @package xxAROX\PresenceMan\entity
@@ -15,8 +16,11 @@ final class Gateway{
 	public static ?int $port = null;
 	public static bool $broken = false;
 
-	public static function getUrl(): string{
-		if (self::$broken) throw new \LogicException("Presence-Man Backend server is not reachable");
+	/**
+	 * @throws \LogicException
+	 */
+	public static function getUrl(bool $again = false): ?string{
+		if (Gateway::$broken) throw new \LogicException("Presence-Man Backend server is not reachable");
 		return self::$protocol . self::$address . (!empty(self::$port) ? ":" . self::$port : "");
 	}
 }

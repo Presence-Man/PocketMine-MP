@@ -51,7 +51,7 @@ class FetchGatewayInformationTask extends AsyncTask{
 		Gateway::$address = ((string) $result["address"]) ?? Gateway::$address;
 		Gateway::$port = empty($result["port"]) ? null : (int) $result["port"];
 		self::ping_backend(function (bool $success): void{
-			if (!$success) PresenceMan::getInstance()->getLogger()->error("Error while connecting to backend-server!");
+			if (!$success) PresenceMan::getInstance()->getLogger()->debug("Error while connecting to backend-server, reconnecting in background..");
 		});
 	}
 
@@ -63,28 +63,43 @@ class FetchGatewayInformationTask extends AsyncTask{
 	 */
 	public static function ping_backend(Closure $callback): void{
 		if (ReconnectingTask::$active) return;
-		Server::getInstance()->getAsyncPool()->submitTask(new class(Gateway::getUrl(), $callback) extends AsyncTask{
-			public function __construct(private string $url, private Closure $callback){
-			}
-			public function onRun(): void{
-				try {
-					$result = Internet::getURL($this->url);
-					$this->setResult($result != null && $result->getCode() == 200);
-				} catch (InternetException $e) {
-					$this->setResult(false);
+		try {
+			$url = Gateway::getUrl();
+			Server::getInstance()->getAsyncPool()->submitTask(new class($url, $callback) extends AsyncTask{
+				public function __construct(private string $url, private Closure $callback){
 				}
-			}
-			public function onCompletion(): void{
-				$success = $this->getResult();
-				if (!$success) {
-					Gateway::$broken = true;
-					ReconnectingTask::activate();
-				} else {
-					ReconnectingTask::deactivate();
-					PresenceMan::getInstance()->getLogger()->notice("This server will be displayed as '" . PresenceMan::$SERVER . "' in presences!");
+				public function onRun(): void{
+					try {
+						$result = Internet::getURL($this->url);
+						$this->setResult($result->getCode());
+					} catch (InternetException $e) {
+						GlobalLogger::get()->logException($e);
+						$this->setResult(404);
+					}
 				}
-				($this->callback)($success);
-			}
-		});
+				public function onCompletion(): void{
+					$code = $this->getResult();
+					if ($code != 200) {
+						Gateway::$broken = true;
+						ReconnectingTask::activate();
+					} else {
+						Gateway::$broken = false;
+						ReconnectingTask::deactivate();
+						PresenceMan::getInstance()->getLogger()->notice("This server will be displayed as '" . PresenceMan::$SERVER . "' in presences!");
+					}
+					($this->callback)($code == 200);
+				}
+			});
+		} catch (\LogicException $e) {
+		}
+	}
+
+	/**
+	 * Function unga_bunga
+	 * @return void
+	 * @internal
+	 */
+	public static function unga_bunga(): void{
+		Server::getInstance()->getAsyncPool()->submitTask(new FetchGatewayInformationTask());
 	}
 }

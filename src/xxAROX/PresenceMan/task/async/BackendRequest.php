@@ -2,7 +2,6 @@
 declare(strict_types=1);
 namespace xxAROX\PresenceMan\task\async;
 use Closure;
-use libraries\libasynCurl\Curl;
 use pocketmine\scheduler\AsyncTask;
 use pocketmine\utils\Internet;
 use pocketmine\utils\InternetException;
@@ -35,6 +34,7 @@ class BackendRequest extends AsyncTask{
 	 * @param ?Closure<array> $onResponse
 	 * @param ?Closure<string> $onError
 	 * @param int $timeout
+	 * @throws \LogicException
 	 */
 	public function __construct(string $request, ?Closure $onResponse = null, ?Closure $onError = null, int $timeout = 10){
 		$this->url = Gateway::getUrl();
@@ -74,6 +74,6 @@ class BackendRequest extends AsyncTask{
 				if (!str_contains($result->getBody(), "<html>")) PresenceMan::getInstance()->getLogger()->error("[API-ERROR] [" .$request->getUri() . "]: " . $result->getBody());
 				if ($this->onError != null) ($this->onError)($result);
 			}
-		} else PresenceMan::getInstance()->getLogger()->error("[JUST-IN-CASE-ERROR] [" . $request->getUri() . "]: got null, that's not good");
+		}
 	}
 }

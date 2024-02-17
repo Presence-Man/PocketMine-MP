@@ -77,10 +77,15 @@ final class PresenceMan extends PluginBase {
 		$update = new UpdateCheckerTask();
 		$update->onRun();
 		$this->getScheduler()->scheduleRepeatingTask($update, 20 *60 *60); // NOTE: 60 minutes
-		$this->getServer()->getAsyncPool()->submitTask(new FetchGatewayInformationTask());
+		FetchGatewayInformationTask::unga_bunga();
     }
 	protected function onDisable(): void{
 		foreach ($this->getServer()->getOnlinePlayers() as $onlinePlayer) self::offline($onlinePlayer);
+	}
+
+	private static function runTask(BackendRequest $task): void{
+		if (!Server::getInstance()->isRunning()) $task->run();
+		else Server::getInstance()->getAsyncPool()->submitTask($task);
 	}
 
 	
@@ -88,14 +93,19 @@ final class PresenceMan extends PluginBase {
 	/**
 	 * Function getHeadURL
 	 * @param string $xuid
-	 * @return string
+	 * @return null | string
 	 */
-	public static function getHeadURL(string $xuid, bool $gray = false, ?int $size = null): string{
-		$size = $size == null ? null : max(self::HEAD_SIZE_MAX, min(self::HEAD_SIZE_MIN, $size));
-		$url = ApiRequest::$URI_GET_HEAD . $xuid;
-		if ($size != null) $url += "?size=" + $size;
-        if ($gray) $url += $size != null ? "&gray" : "?gray";
-		return Gateway::getUrl() . $url;
+	public static function getHeadURL(string $xuid, bool $gray = false, ?int $size = null): ?string{
+		try {
+			$gateway_url = Gateway::getUrl();
+			$size = $size == null ? null : max(self::HEAD_SIZE_MAX, min(self::HEAD_SIZE_MIN, $size));
+			$url = ApiRequest::$URI_GET_HEAD . $xuid;
+			if ($size != null) $url += "?size=" + $size;
+			if ($gray) $url += $size != null ? "&gray" : "?gray";
+			return $gateway_url . $url;
+		} catch (\LogicException $e) {
+			return null;
+		}
 	}
 
 	/**
@@ -104,7 +114,12 @@ final class PresenceMan extends PluginBase {
 	* @return string
 	*/
 	public static function getSkinURL(string $xuid): string{
-		return Gateway::getUrl() . ApiRequest::$URI_GET_SKIN . $xuid;
+		try {
+			$gateway_url = Gateway::getUrl();
+			return $gateway_url . ApiRequest::$URI_GET_SKIN . $xuid;
+		} catch (\LogicException $e) {
+			return null;
+		}
 	}
 
 	/**
@@ -126,13 +141,19 @@ final class PresenceMan extends PluginBase {
 			"api_activity" => $activity?->json_serialize(),
 		], true);
 		$request->header("Token", self::$TOKEN);
-		Server::getInstance()->getAsyncPool()->submitTask(new BackendRequest(
-			$request->serialize(),
-			function (array $response) use ($player, $activity): void{
-				if (isset($response["status"]) == 200) self::$presences[$player->getXuid()] = $activity;
-				else PresenceMan::getInstance()->getLogger()->error("Failed to update presence for " . $player->getName() . ": " . $response["message"] ?? "n/a");
-			}
-		));
+		
+		if (Gateway::$broken) return;
+		try {
+			$task = new BackendRequest(
+				$request->serialize(),
+				function (array $response) use ($player, $activity): void{
+					if (isset($response["status"]) == 200) self::$presences[$player->getXuid()] = $activity;
+					else PresenceMan::getInstance()->getLogger()->error("Failed to update presence for " . $player->getName() . ": " . $response["message"] ?? "n/a");
+				}
+			);
+			PresenceMan::runTask($task);
+		} catch (\LogicException $e) {
+		}
 	}
 
 	/**
@@ -156,14 +177,13 @@ final class PresenceMan extends PluginBase {
 			"skin" => $raw_skin,
 		], true);
 		$request->header("Token", self::$TOKEN);
-		$task = new BackendRequest($request->serialize());
 
-		if (!Server::getInstance()->isRunning()) {
-			try {
-				$task->run();
-			} catch (\Throwable $ignore) {
-			}
-		} else Server::getInstance()->getAsyncPool()->submitTask($task);
+		if (Gateway::$broken) return;
+		try {
+			$task = new BackendRequest($request->serialize());
+			PresenceMan::runTask($task);
+		} catch (\LogicException $e) {
+		}
 	}
 
 	/**
@@ -179,18 +199,17 @@ final class PresenceMan extends PluginBase {
 			"xuid" => $player->getXuid()
 		], true);
 		$request->header("Token", self::$TOKEN);
-		$task = new BackendRequest(
-			$request->serialize(),
-			function (array $response) use ($player): void{
-				unset(self::$presences[$player->getXuid()]);
-			}
-		);
 
-		if (!Server::getInstance()->isRunning()) {
-			try {
-				$task->run();
-			} catch (\Throwable $ignore) {
-			}
-		} else Server::getInstance()->getAsyncPool()->submitTask($task);
+		if (Gateway::$broken) return;
+		try {
+			$task = new BackendRequest(
+				$request->serialize(),
+				function (array $response) use ($player): void{
+					unset(self::$presences[$player->getXuid()]);
+				}
+			);
+			PresenceMan::runTask($task);
+		} catch (\LogicException $e) {
+		}
 	}
 }
