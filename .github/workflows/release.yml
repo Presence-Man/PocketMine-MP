@@ -50,7 +50,7 @@ jobs:
           automatic_release_tag: "v${{ steps.metadata.outputs.VERSION }}"
           prerelease: false
           title: "Stable release v${{ steps.metadata.outputs.VERSION }}"
-          files: "Presence-Man-PocketMine-MP.phar"
+          files: "Presence-Man*.phar"
 
       - name: "Create latest_version.txt"
         run: "echo \"${{ steps.metadata.outputs.VERSION }}\" > latest_version.txt"
