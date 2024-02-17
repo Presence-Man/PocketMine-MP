@@ -22,7 +22,7 @@ use xxAROX\PresenceMan\task\ReconnectingTask;
  * @project pmmp
  */
 class FetchGatewayInformationTask extends AsyncTask{
-	private const URL = "https://raw.githubusercontent.com/Presence-Man/releases/main/gateway.json";
+	private const URL = "https://raw.githubusercontent.com/Presence-Man/Gateway/main/gateway.json";
 
 	public function onRun(): void{
 		$response = Internet::getURL(self::URL, 5, [
