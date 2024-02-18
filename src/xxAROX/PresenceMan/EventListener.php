@@ -27,7 +27,7 @@ class EventListener implements Listener{
 	public function PlayerLoginEvent(PlayerLoginEvent $event): void{
 		if (Utils::isFromSameHost($event->getPlayer()->getNetworkSession()->getIp())) return;
 		if (!PresenceMan::$ENABLE_DEFAULT) return;
-		if (!PresenceMan::$UPDATE_SKIN) PresenceMan::save_skin($event->getPlayer(), $event->getPlayer()->getSkin());
+		if (PresenceMan::$UPDATE_SKIN) PresenceMan::save_skin($event->getPlayer(), $event->getPlayer()->getSkin());
 		PresenceMan::setActivity($event->getPlayer(), ApiActivity::default_activity());
 	}
 

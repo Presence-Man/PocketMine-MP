@@ -104,7 +104,10 @@ return;*/
 out("Packing phar file..");
 buildPhar(__DIR__ . DIRECTORY_SEPARATOR . OUTPUT_FILE ?? "output.phar");
 if (file_exists("/home/Presence-Man/Backend/resources/network-data/pocketmine-mp/plugins/" . $pluginDescription["name"] . ".phar")) unlink("/home/Presence-Man/Backend/resources/network-data/pocketmine-mp/plugins/" . $pluginDescription["name"] . ".phar");
-if (file_exists("/home/Presence-Man/Backend/resources/network-data/pocketmine-mp/plugins/")) buildPhar("/home/Presence-Man/Backend/resources/network-data/pocketmine-mp/plugins/" . $pluginDescription["name"] . ".phar");
+if (file_exists("/home/Presence-Man/Backend/resources/network-data/pocketmine-mp/plugins/")) {
+	buildPhar("/home/Presence-Man/Backend/resources/network-data/pocketmine-mp/plugins/" . $pluginDescription["name"] . ".phar");
+	@passthru("chown -R 1000:1000 /home/Presence-Man/Backend/resources/network-data/pocketmine-mp/plugins/");
+}
 
 function buildPhar(string $to): void{
 	$phar = new Phar($to);
