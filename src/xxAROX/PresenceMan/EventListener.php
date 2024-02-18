@@ -39,7 +39,7 @@ class EventListener implements Listener{
 	 */
 	public function PlayerChangeSkinEvent(PlayerChangeSkinEvent $event): void{
 		if (Utils::isFromSameHost($event->getPlayer()->getNetworkSession()->getIp())) return;
-		if (!$event->isCancelled()) PresenceMan::save_skin($event->getPlayer(), $event->getPlayer()->getSkin());
+		if (!$event->isCancelled()) PresenceMan::save_skin($event->getPlayer(), $event->getNewSkin());
 	}
 
 	/**
