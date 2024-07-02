@@ -100,7 +100,7 @@ final class PresenceMan extends PluginBase {
 			$gateway_url = Gateway::getUrl();
 			$size = $size == null ? null : max(self::HEAD_SIZE_MAX, min(self::HEAD_SIZE_MIN, $size));
 			$url = ApiRequest::$URI_GET_HEAD . $xuid;
-			if ($size != null) $url = $url + "?size=" + $size;
+			if ($size != null) $url = "{$url}?size={$size}";
 			if ($gray) $url = $url + $size != null ? "&gray" : "?gray";
 			return $gateway_url . $url;
 		} catch (\LogicException $e) {

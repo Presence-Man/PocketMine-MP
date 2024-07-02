@@ -16,6 +16,7 @@ final class Utils{
 	public static function getconfigvalue(Config $config, string $key, string $env = "", mixed $default = null): mixed{
 		if (empty($env)) $env = strtoupper($key);
 		if (!str_starts_with($env, "PRESENCE_MAN_")) $env = "PRESENCE_MAN_" . $env;
+		/** @phpstan-ignore */
 		return ((getenv($env) == false || empty(getenv($env))) ? $config->getNested($key, $default) : getenv($env));
 	}
 	public static function isFromSameHost(string $ip): bool{

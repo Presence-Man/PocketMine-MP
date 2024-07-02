@@ -60,7 +60,7 @@ class BackendRequest extends AsyncTask{
 
 	public function onCompletion(): void{
 		$request = ApiRequest::deserialize($this->request);
-		/** @var InternetRequestResult $result */
+		/** @var null|InternetRequestResult $result */
 		$result = $this->getResult();
 		if (!is_null($result)) {
 			if (in_array($result->getCode(), range(100, 399))) { // Good
