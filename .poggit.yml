@@ -5,5 +5,5 @@ branches:
 projects:
   Presence-Man_PocketMine-MP:
     path: ""
-    icon: "https://avatars.githubusercontent.com/u/134139629?s=200&v=4"
+    icon: "https://raw.githubusercontent.com/Presence-Man/Application/main/src/main/resources/icon.png"
 ...
