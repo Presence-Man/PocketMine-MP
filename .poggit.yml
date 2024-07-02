@@ -1,0 +1,8 @@
+--- # Poggit-CI Manifest. Open the CI at https://poggit.pmmp.io/ci/Presence-Man/Presence-Man_PocketMine-MP
+build-by-default: true
+branches:
+- main
+projects:
+  Presence-Man_PocketMine-MP:
+    path: ""
+...

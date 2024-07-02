@@ -40,7 +40,7 @@ PresenceMan::setActivity($player, $bedwars_activity);
 ```
 
 
-### Get head url:
+### Get head url: (only works for Presence-Man players)
 ```php
 use xxAROX\PresenceMan\PresenceMan;
 /** @var \pocketmine\player\Player $player */
