@@ -1,9 +1,9 @@
---- # Poggit-CI Manifest. Open the CI at https://poggit.pmmp.io/ci/Presence-Man/Presence-Man_PocketMine-MP
+--- # Poggit-CI Manifest. Open the CI at https://poggit.pmmp.io/ci/Presence-Man/PocketMine-MP
 build-by-default: true
 branches:
 - main
 projects:
   Presence-Man_PocketMine-MP:
     path: ""
-    icon: "https://raw.githubusercontent.com/Presence-Man/PocketMine-MP/main/icon.png"
+    icon: "https://github.com/Presence-Man/PocketMine-MP/blob/29de4c1df92b32d45f121897b0f3df593db579d9/icon.png"
 ...
