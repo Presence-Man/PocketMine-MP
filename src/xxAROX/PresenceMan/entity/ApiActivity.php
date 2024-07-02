@@ -42,8 +42,7 @@ final class ApiActivity{
 		return json_encode($this->json_serialize());
 	}
 
-	#[Pure]
-	#[ArrayShape([
+	/*#[ArrayShape([
 		'type'                   => "string",
 		'client_id'              => "null|string",
 		'state'                  => "null|string",
@@ -53,7 +52,7 @@ final class ApiActivity{
 		'large_icon_text'        => "null|string",
 		'party_max_player_count' => "null|int",
 		'party_player_count'     => "null|int",
-	])] public function json_serialize(): array{
+	])]*/ public function json_serialize(): array{
 		return [
 			'client_id' => PresenceMan::$CLIENT_ID,
 			'type' => $this->type->value,
@@ -67,7 +66,7 @@ final class ApiActivity{
 		];
 	}
 
-	public static function deserialize(array $json): APIActivity{
+	public static function deserialize(array $json): ApiActivity{
 		$type = isset($json['type']) ? (ActivityType::tryFrom(mb_strtoupper($json['type'])) ?? ActivityType::PLAYING) : ActivityType::PLAYING;
 		$state = $json['state'] ?? null;
 		$details = $json['details'] ?? null;
@@ -76,7 +75,7 @@ final class ApiActivity{
 		$large_icon_text = $json['large_icon_text'] ?? null;
 		$party_max_player_count = $json['party_max_player_count'] ?? null;
 		$party_player_count = $json['party_player_count'] ?? null;
-		return new APIActivity(
+		return new ApiActivity(
 			$type,
 			$state,
 			$details,

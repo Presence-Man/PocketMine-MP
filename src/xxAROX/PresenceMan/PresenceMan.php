@@ -100,8 +100,8 @@ final class PresenceMan extends PluginBase {
 			$gateway_url = Gateway::getUrl();
 			$size = $size == null ? null : max(self::HEAD_SIZE_MAX, min(self::HEAD_SIZE_MIN, $size));
 			$url = ApiRequest::$URI_GET_HEAD . $xuid;
-			if ($size != null) $url += "?size=" + $size;
-			if ($gray) $url += $size != null ? "&gray" : "?gray";
+			if ($size != null) $url = $url + "?size=" + $size;
+			if ($gray) $url = $url + $size != null ? "&gray" : "?gray";
 			return $gateway_url . $url;
 		} catch (\LogicException $e) {
 			return null;
@@ -113,7 +113,7 @@ final class PresenceMan extends PluginBase {
 	* @param string $xuid
 	* @return string
 	*/
-	public static function getSkinURL(string $xuid): string{
+	public static function getSkinURL(string $xuid): ?string{
 		try {
 			$gateway_url = Gateway::getUrl();
 			return $gateway_url . ApiRequest::$URI_GET_SKIN . $xuid;
@@ -148,7 +148,7 @@ final class PresenceMan extends PluginBase {
 				$request->serialize(),
 				function (array $response) use ($player, $activity): void{
 					if (isset($response["status"]) == 200) self::$presences[$player->getXuid()] = $activity;
-					else PresenceMan::getInstance()->getLogger()->error("Failed to update presence for " . $player->getName() . ": " . $response["message"] ?? "n/a");
+					else PresenceMan::getInstance()->getLogger()->error("Failed to update presence for " . $player->getName() . ": " . ($response["message"] ?? "n/a"));
 				}
 			);
 			PresenceMan::runTask($task);

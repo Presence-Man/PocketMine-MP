@@ -47,9 +47,9 @@ class FetchGatewayInformationTask extends AsyncTask{
 			PresenceMan::getInstance()->getLogger()->warning("Couldn't fetch gateway data!");
 			return;
 		}
-		Gateway::$protocol = ((string) $result["protocol"]) ?? Gateway::$protocol;
-		Gateway::$address = ((string) $result["address"]) ?? Gateway::$address;
-		Gateway::$port = empty($result["port"]) ? null : (int) $result["port"];
+		Gateway::$protocol = (((string) $result["protocol"]) ?? Gateway::$protocol);
+		Gateway::$address = (((string) $result["address"]) ?? Gateway::$address);
+		Gateway::$port = (empty($result["port"]) ? null : (int) $result["port"]);
 		self::ping_backend(function (bool $success): void{
 			if (!$success) PresenceMan::getInstance()->getLogger()->debug("Error while connecting to backend-server, reconnecting in background..");
 		});
@@ -57,7 +57,7 @@ class FetchGatewayInformationTask extends AsyncTask{
 
 	/**
 	 * Function ping_backend
-	 * @param Closure<bool> $callback
+	 * @param Closure $callback (bool $success) => void
 	 * @return void
 	 * @internal
 	 */

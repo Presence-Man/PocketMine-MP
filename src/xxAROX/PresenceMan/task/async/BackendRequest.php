@@ -31,8 +31,8 @@ class BackendRequest extends AsyncTask{
 	/**
 	 * BackendRequest constructor.
 	 * @param string $request
-	 * @param ?Closure<array> $onResponse
-	 * @param ?Closure<string> $onError
+	 * @param ?Closure $onResponse (array $response) => void
+	 * @param ?Closure $onError (InternetRequestResult $error) => void
 	 * @param int $timeout
 	 * @throws \LogicException
 	 */
@@ -51,14 +51,18 @@ class BackendRequest extends AsyncTask{
 		$headers = [];
 		$request = ApiRequest::deserialize($this->request);
 		foreach ($request->getHeaders() as $hk => $hv) $headers[] = $hk . ": " . $hv;
-		$result = $request->isPostMethod() ? Internet::postURL($this->url . $request->getUri(), json_encode($request->getBody()), 10, $headers, $err) : Internet::getURL($this->url . $request->getUri(), 10, $headers, $err);
+		$result = $request->isPostMethod() 
+			? Internet::postURL($this->url . $request->getUri(), json_encode($request->getBody()), $this->timeout, $headers, $err) 
+			: Internet::getURL($this->url . $request->getUri(), $this->timeout, $headers, $err)
+		;
 		$this->setResult($result);
 	}
 
 	public function onCompletion(): void{
 		$request = ApiRequest::deserialize($this->request);
 		/** @var InternetRequestResult $result */
-		if (!is_null($result = $this->getResult())) {
+		$result = $this->getResult();
+		if (!is_null($result)) {
 			if (in_array($result->getCode(), range(100, 399))) { // Good
 				try {
 					$result = json_decode($result->getBody(), true, 512, JSON_THROW_ON_ERROR);
