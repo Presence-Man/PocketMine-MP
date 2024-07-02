@@ -47,7 +47,7 @@ class FetchGatewayInformationTask extends AsyncTask{
 			PresenceMan::getInstance()->getLogger()->warning("Couldn't fetch gateway data!");
 			return;
 		}
-		Gateway::$protocol = (string) $result["protocol"] ?? Gateway::$protocol;
+		Gateway::$protocol = empty($result["protocol"]) ? Gateway::$protocol : (string) $result["protocol"];
 		Gateway::$address = empty($result["address"]) ? Gateway::$address : (string) $result["address"];
 		Gateway::$port = empty($result["port"]) ? null : (int) $result["port"];
 		self::ping_backend(function (bool $success): void{
