@@ -23,7 +23,7 @@ final class ApiRequest{
 	/** @internal */
 	static string $URI_UPDATE_PRESENCE = "/api/v1/servers/update_presence";
 	/** @internal */
-	static string $URI_UPDATE_SKIN = "/api/v1/images/skins/update";
+	static string $URI_UPDATE_SKIN = "/api/v1/servers/update_skin";
 	/** @internal */
 	static string $URI_UPDATE_OFFLINE = "/api/v1/servers/offline";
 	/** @internal */
